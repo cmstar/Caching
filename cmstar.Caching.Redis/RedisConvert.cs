@@ -5,6 +5,9 @@ using StackExchange.Redis;
 
 namespace cmstar.Caching.Redis
 {
+    /// <summary>
+    /// 包含CLR对象与Redis存储值间转换的相关方法。
+    /// </summary>
     public static class RedisConvert
     {
         /// <summary>
@@ -154,7 +157,7 @@ namespace cmstar.Caching.Redis
                     return ((Guid)value).ToString("N");
 
                 default:
-                    return JsonSerializer.Default.Serialize(value);
+                    return JsonSerializer.Default.FastSerialize(value);
             }
         }
 
