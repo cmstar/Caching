@@ -67,7 +67,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase, KeyBase,
+            var key = CacheUtils.BuildCacheKey(KeyBase,
                 ReferenceEquals(v, null) ? string.Empty : v.ToString());
             return new KeyOperation<TRes>(this, key);
         }
