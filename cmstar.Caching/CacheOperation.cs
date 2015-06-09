@@ -67,8 +67,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase,
-                ReferenceEquals(v, null) ? string.Empty : v.ToString());
+            var key = CacheUtils.BuildCacheKey(KeyBase, v);
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -102,9 +101,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase,
-                ReferenceEquals(v1, null) ? string.Empty : v1.ToString(),
-                ReferenceEquals(v2, null) ? string.Empty : v2.ToString());
+            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2);
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -140,10 +137,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase,
-                ReferenceEquals(v1, null) ? string.Empty : v1.ToString(),
-                ReferenceEquals(v2, null) ? string.Empty : v2.ToString(),
-                ReferenceEquals(v3, null) ? string.Empty : v3.ToString());
+            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3);
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -181,11 +175,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3, T4 v4)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase,
-                ReferenceEquals(v1, null) ? string.Empty : v1.ToString(),
-                ReferenceEquals(v2, null) ? string.Empty : v2.ToString(),
-                ReferenceEquals(v3, null) ? string.Empty : v3.ToString(),
-                ReferenceEquals(v4, null) ? string.Empty : v4.ToString());
+            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3, v4);
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -225,7 +215,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3, T4 v4, T5 v5)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3, v4, v5);
+            var key = CacheUtils.BuildCacheKey(KeyBase, new object[] { v1, v2, v3, v4, v5 });
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -267,7 +257,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, T6 v6)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3, v4, v5, v6);
+            var key = CacheUtils.BuildCacheKey(KeyBase, new object[] { v1, v2, v3, v4, v5, v6 });
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -311,7 +301,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, T6 v6, T7 v7)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3, v4, v5, v6, v7);
+            var key = CacheUtils.BuildCacheKey(KeyBase, new object[] { v1, v2, v3, v4, v5, v6, v7 });
             return new KeyOperation<TRes>(this, key);
         }
     }
@@ -357,7 +347,7 @@
         /// <returns>操作给定的缓存键的实例。</returns>
         public KeyOperation<TRes> Key(T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, T6 v6, T7 v7, T8 v8)
         {
-            var key = CacheUtils.BuildCacheKey(KeyBase, v1, v2, v3, v4, v5, v6, v7, v8);
+            var key = CacheUtils.BuildCacheKey(KeyBase, new object[] { v1, v2, v3, v4, v5, v6, v7, v8 });
             return new KeyOperation<TRes>(this, key);
         }
     }
