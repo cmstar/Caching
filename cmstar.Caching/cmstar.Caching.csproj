@@ -48,6 +48,7 @@
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheProvider.cs" />
     <Compile Include="KeyOperation.cs" />
+    <Compile Include="L2CacheProvider.cs" />
     <Compile Include="MemoryCacheProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

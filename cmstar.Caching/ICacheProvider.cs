@@ -11,7 +11,7 @@ namespace cmstar.Caching
         /// 获取具有指定键的缓存值。
         /// </summary>
         /// <param name="key">缓存的键。</param>
-        /// <returns>缓存的值。若缓存不存在，返回null。</returns>
+        /// <returns>缓存的值。若缓存不存在，返回<typeparamref name="T"/>的默认值。</returns>
         /// <remarks>
         /// 对于缓存值也可以为null的情况，使用此方法不能分辨缓存是否存在。
         /// 此时可使用<see cref="TryGet{T}"/>方法替代。
