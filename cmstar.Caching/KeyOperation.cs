@@ -17,6 +17,14 @@ namespace cmstar.Caching
         }
 
         /// <summary>
+        /// 获取当前使用的缓存键。
+        /// </summary>
+        public string Key
+        {
+            get { return _key; }
+        }
+
+        /// <summary>
         /// 获取缓存值。
         /// </summary>
         /// <returns>缓存的值。若缓存不存在，返回null。</returns>
