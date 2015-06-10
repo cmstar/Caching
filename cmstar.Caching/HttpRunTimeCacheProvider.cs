@@ -12,7 +12,7 @@ namespace cmstar.Caching
         public T Get<T>(string key)
         {
             var v = HttpRuntime.Cache.Get(key);
-            return ReferenceEquals(CacheUtils.NullValue, v) ? default(T) : (T)v;
+            return v == null || ReferenceEquals(CacheUtils.NullValue, v) ? default(T) : (T)v;
         }
 
         public bool TryGet<T>(string key, out T value)
