@@ -36,13 +36,15 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 以<see cref="TimeSpan"/>为参照值，创建一个新的<see cref="CacheExpiration"/>实例。
+        /// 时间精确到秒。
         /// </summary>
         /// <param name="baseExpiration">缓存的基本过期时间。</param>
-        /// <param name="randomRange">过期时间的随机量，使用<see cref="TimeSpan.Zero"/>表示不添加随机量。</param>
+        /// <param name="randomRange">过期时间的随机量。</param>
         /// <returns><see cref="CacheExpiration"/>实例。</returns>
-        public static CacheExpiration FromTimeSpan(TimeSpan baseExpiration, TimeSpan randomRange)
+        public static CacheExpiration FromTimeSpan(TimeSpan baseExpiration, TimeSpan? randomRange = null)
         {
-            return new CacheExpiration(baseExpiration.Seconds, randomRange.Seconds);
+            var rnd = randomRange.HasValue ? (int)randomRange.Value.TotalSeconds : 0;
+            return new CacheExpiration((int)baseExpiration.TotalSeconds, rnd);
         }
 
         private readonly int _baseExpirationSeconds;
