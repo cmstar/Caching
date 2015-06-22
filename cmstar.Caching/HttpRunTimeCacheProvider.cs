@@ -9,6 +9,13 @@ namespace cmstar.Caching
     /// </summary>
     public class HttpRuntimeCacheProvider : ICacheProvider
     {
+        /// <summary>
+        /// 获取<see cref="HttpRuntimeCacheProvider"/>的唯一实例。
+        /// </summary>
+        public static readonly HttpRuntimeCacheProvider Instance = new HttpRuntimeCacheProvider();
+
+        private HttpRuntimeCacheProvider() { }
+
         public T Get<T>(string key)
         {
             var v = HttpRuntime.Cache.Get(key);
