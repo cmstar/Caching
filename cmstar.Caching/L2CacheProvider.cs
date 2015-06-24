@@ -63,8 +63,9 @@ namespace cmstar.Caching
 
         public bool Remove(string key)
         {
+            var res = _level2.Remove(key);
             _level1.Remove(key);
-            return _level2.Remove(key);
+            return res;
         }
 
         private void SetLevel1<T>(string key, T value)
