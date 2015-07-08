@@ -27,7 +27,8 @@ namespace cmstar.Caching.Redis
             switch (dataType)
             {
                 case RedisCacheDataType.String:
-                    return (byte)redisValue;
+                    var v = (string)redisValue;
+                    return v == NullValue ? null : v;
 
                 case RedisCacheDataType.Boolean:
                     return (bool)redisValue;
