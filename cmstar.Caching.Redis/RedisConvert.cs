@@ -104,7 +104,7 @@ namespace cmstar.Caching.Redis
             switch (dateType)
             {
                 case RedisCacheDataType.String:
-                    return (byte)value;
+                    return (string)value;
 
                 case RedisCacheDataType.Boolean:
                     return (bool)value;
