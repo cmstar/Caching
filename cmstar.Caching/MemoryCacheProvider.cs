@@ -22,14 +22,14 @@ namespace cmstar.Caching
         public T Get<T>(string key)
         {
             var v = _cache.Get(key);
-            return v == null || ReferenceEquals(CacheUtils.NullValue, v) ? default(T) : (T)v;
+            return v == null || ReferenceEquals(CacheEnv.NullValue, v) ? default(T) : (T)v;
         }
 
         public bool TryGet<T>(string key, out T value)
         {
             var v = _cache.Get(key);
 
-            if (v == null || ReferenceEquals(CacheUtils.NullValue, v))
+            if (v == null || ReferenceEquals(CacheEnv.NullValue, v))
             {
                 value = default(T);
                 return false;
@@ -46,7 +46,7 @@ namespace cmstar.Caching
                 : DateTimeOffset.Now.Add(expiration);
 
             object v = value;
-            _cache.Set(key, v ?? CacheUtils.NullValue, e);
+            _cache.Set(key, v ?? CacheEnv.NullValue, e);
         }
 
         public bool Remove(string key)

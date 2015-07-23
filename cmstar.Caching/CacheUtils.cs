@@ -6,15 +6,6 @@ namespace cmstar.Caching
     internal static class CacheUtils
     {
         /// <summary>
-        /// 用于在本地内存缓存中表示<c>null</c>。
-        /// </summary>
-        /// <remarks>
-        /// 例如<see cref="System.Web.HttpRuntime.Cache"/>不支持缓存null，为了能使null被缓存下来，
-        /// 需用一个特殊的对象类表示null。
-        /// </remarks>
-        internal static readonly object NullValue = new object();
-
-        /// <summary>
         /// 获取缓存的键。
         /// </summary>
         /// <param name="keyBase">缓存键的前缀部分。</param>
@@ -23,7 +14,7 @@ namespace cmstar.Caching
         public static string BuildCacheKey(string keyBase, object element)
         {
             var sb = new StringBuilder(keyBase);
-            sb.Append(':').Append(ToString(element));
+            sb.Append(':').ExAppend(element);
 
             return sb.ToString();
         }
@@ -38,8 +29,8 @@ namespace cmstar.Caching
         public static string BuildCacheKey(string keyBase, object element1, object element2)
         {
             var sb = new StringBuilder(keyBase);
-            sb.Append(':').Append(ToString(element1))
-                .Append('_').Append(ToString(element2));
+            sb.Append(':').ExAppend(element1)
+                .Append('_').ExAppend(element2);
 
             return sb.ToString();
         }
@@ -56,9 +47,9 @@ namespace cmstar.Caching
             string keyBase, object element1, object element2, object element3)
         {
             var sb = new StringBuilder(keyBase);
-            sb.Append(':').Append(ToString(element1))
-                .Append('_').Append(ToString(element2))
-                .Append('_').Append(ToString(element3));
+            sb.Append(':').ExAppend(element1)
+                .Append('_').ExAppend(element2)
+                .Append('_').ExAppend(element3);
 
             return sb.ToString();
         }
@@ -76,10 +67,10 @@ namespace cmstar.Caching
             string keyBase, object element1, object element2, object element3, object element4)
         {
             var sb = new StringBuilder(keyBase);
-            sb.Append(':').Append(ToString(element1))
-                .Append('_').Append(ToString(element2))
-                .Append('_').Append(ToString(element3))
-                .Append('_').Append(ToString(element4));
+            sb.Append(':').ExAppend(element1)
+                .Append('_').ExAppend(element2)
+                .Append('_').ExAppend(element3)
+                .Append('_').ExAppend(element4);
 
             return sb.ToString();
         }
@@ -100,28 +91,79 @@ namespace cmstar.Caching
 
                 for (int i = 0; i < elements.Length; i++)
                 {
-                    if (i > 0) sb.Append('_');
+                    if (i > 0)
+                    {
+                        sb.Append('_');
+                    }
 
                     var e = elements[i];
-                    sb.Append(ToString(e));
+                    sb.ExAppend(e);
                 }
             }
 
             return sb.ToString();
         }
 
-        private static string ToString(object element)
+        private static StringBuilder ExAppend(this StringBuilder sb, object v)
         {
-            if (element == null)
-                return string.Empty;
+            if (v == null)
+            {
+                sb.Append(CacheEnv.NullValueString);
+                return sb;
+            }
 
-            if (element is bool)
-                return ((bool)element) ? "1" : "0";
+            var escape = false;
+            var s = v as string;
 
-            if (element is DateTime)
-                return ((DateTime)element).Ticks.ToString();
+            if (s != null)
+            {
+                escape = true;
+            }
+            else if (v is bool)
+            {
+                s = ((bool)v) ? "1" : "0";
+            }
+            else if (v is DateTime)
+            {
+                s = ((DateTime)v).Ticks.ToString();
+            }
+            else if (v is Guid)
+            {
+                s = ((Guid)v).ToString("N");
+            }
+            else
+            {
+                s = v.ToString();
+                escape = true;
+            }
 
-            return element.ToString();
+            if (!escape)
+            {
+                sb.Append(s);
+                return sb;
+            }
+
+            var len = s.Length;
+            for (int i = 0; i < len; i++)
+            {
+                var c = s[i];
+                switch (c)
+                {
+                    case '\\':
+                        sb.Append(@"\\");
+                        break;
+
+                    case '_':
+                        sb.Append(@"\_");
+                        break;
+
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
+
+            return sb;
         }
     }
 }

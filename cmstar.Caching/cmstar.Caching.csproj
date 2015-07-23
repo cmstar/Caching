@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgAssert.cs" />
+    <Compile Include="CacheEnv.cs" />
     <Compile Include="CacheExpiration.cs" />
     <Compile Include="CacheOperation.cs" />
     <Compile Include="CacheOperationBase.cs" />

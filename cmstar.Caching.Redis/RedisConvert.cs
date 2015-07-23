@@ -11,11 +11,6 @@ namespace cmstar.Caching.Redis
     public static class RedisConvert
     {
         /// <summary>
-        /// 用于表示null。
-        /// </summary>
-        public const string NullValue = "NIL*Zrx40vMTx23vnGxnA";
-
-        /// <summary>
         /// 将<see cref="RedisValue"/>转换为指定的CLR类型的实例。
         /// </summary>
         /// <typeparam name="T">转换后的目标类型。</typeparam>
@@ -28,7 +23,7 @@ namespace cmstar.Caching.Redis
             {
                 case RedisCacheDataType.String:
                     var v = (string)redisValue;
-                    return v == NullValue ? null : v;
+                    return v == CacheEnv.NullValueString ? null : v;
 
                 case RedisCacheDataType.Boolean:
                     return (bool)redisValue;
@@ -83,7 +78,7 @@ namespace cmstar.Caching.Redis
 
                 default:
                     var stringValue = redisValue;
-                    if (NullValue.Equals(stringValue))
+                    if (CacheEnv.NullValueString.Equals(stringValue))
                         return null;
 
                     return JsonSerializer.Default.Deserialize<T>(stringValue);
@@ -99,7 +94,7 @@ namespace cmstar.Caching.Redis
         public static RedisValue ToRedisValue(RedisCacheDataType dateType, object value)
         {
             if (value == null)
-                return NullValue;
+                return CacheEnv.NullValueString;
 
             switch (dateType)
             {
