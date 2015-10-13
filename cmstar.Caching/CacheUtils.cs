@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Text;
 
 namespace cmstar.Caching
@@ -131,8 +132,20 @@ namespace cmstar.Caching
             {
                 s = ((Guid)v).ToString("N");
             }
+            else if (v is Enum)
+            {
+                s = Convert.ToInt64(v).ToString();
+            }
             else
             {
+                // 对于复杂类型，仅兼容数组（序列）
+                var array = v as IEnumerable;
+                if (array != null)
+                {
+                    AppendArray(sb, array);
+                    return sb;
+                }
+
                 s = v.ToString();
                 escape = true;
             }
@@ -147,26 +160,57 @@ namespace cmstar.Caching
             for (int i = 0; i < len; i++)
             {
                 var c = s[i];
+
                 switch (c)
                 {
-                    case '\\':
-                        sb.Append(@"\\");
-                        break;
-
-                    case '_':
-                        sb.Append(@"\_");
-                        break;
-
-                    default:
-                        sb.Append(c);
+                    case '\\': // 转义符自身
+                    case '_':  // 各参数的分隔符
+                    case '~':  // 数组元素分隔符
+                        sb.Append('\\');
                         break;
                 }
+
+                sb.Append(c);
             }
 
             if (sb.Length > CacheEnv.CacheKeyMaxLength)
                 throw new CacheKeyTooLongException(sb.Length);
 
             return sb;
+        }
+
+        private static void AppendArray(StringBuilder sb, IEnumerable elements)
+        {
+            /*
+             * 序列以形如 [1~2~3] 的方式组装，即以[]包含，元素间使用~分隔，
+             * ~字符是需要转义的，而[]不需要转义，为了避免与字符串"[]"间的歧义，
+             * 对于空序列，也拼入~，使其成为[~]，以便与字符串区分开来，
+             * 因为字符串的"[~]"会被转义为"[\~]"
+             */
+
+            sb.Append('[');
+
+            var hasElement = false;
+            foreach (var e in elements)
+            {
+                if (hasElement)
+                {
+                    sb.Append('~');
+                }
+                else
+                {
+                    hasElement = true;
+                }
+
+                sb.ExAppend(e);
+            }
+
+            if (!hasElement)
+            {
+                sb.Append('~');
+            }
+
+            sb.Append(']');
         }
     }
 }
