@@ -18,5 +18,10 @@
         /// 用于表示<c>null</c>在缓存中作为字符串存储时的替代。
         /// </summary>
         public const string NullValueString = "NIL*Zrx40vMTx23vnGxnA";
+
+        /// <summary>
+        /// 定义缓存的键的最大长度。
+        /// </summary>
+        public const int CacheKeyMaxLength = 2048;
     }
 }

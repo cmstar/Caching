@@ -163,6 +163,9 @@ namespace cmstar.Caching
                 }
             }
 
+            if (sb.Length > CacheEnv.CacheKeyMaxLength)
+                throw new CacheKeyTooLongException(sb.Length);
+
             return sb;
         }
     }
