@@ -100,7 +100,7 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 得到一个新的过期时间，单位为秒。若过期时间包含有随机梁，该时间已经经过随机量的计算。
+        /// 得到一个新的过期时间，单位为秒。若过期时间包含有随机量，该时间已经经过随机量的计算。
         /// </summary>
         /// <returns>过期时间。</returns>
         public int NewExpirationSeconds()
