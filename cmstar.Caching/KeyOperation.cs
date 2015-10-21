@@ -25,6 +25,14 @@ namespace cmstar.Caching
         }
 
         /// <summary>
+        /// 获取当前绑定的基本缓存超时时间，单位为秒。
+        /// </summary>
+        public int BaseExpirationSeconds
+        {
+            get { return _cacheManager.Expiration.BaseExpirationSeconds; }
+        }
+
+        /// <summary>
         /// 获取缓存值。
         /// </summary>
         /// <returns>缓存的值。若缓存不存在，返回null。</returns>
@@ -48,12 +56,22 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 设置一个缓存。
+        /// 设置一个缓存，并自动设置其超时。
         /// </summary>
         /// <param name="value">缓存的值。</param>
         public void Set(TValue value)
         {
             var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            Set(value, expirationSeconds);
+        }
+
+        /// <summary>
+        /// 设置一个缓存，并指定其超时时间。
+        /// </summary>
+        /// <param name="value">缓存的值。</param>
+        /// <param name="expirationSeconds">超时时间，单位为秒。</param>
+        public void Set(TValue value, int expirationSeconds)
+        {
             _cacheManager.CacheProvider.Set(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
