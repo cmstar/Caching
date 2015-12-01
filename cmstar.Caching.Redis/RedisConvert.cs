@@ -88,15 +88,15 @@ namespace cmstar.Caching.Redis
         /// <summary>
         /// 将给定的对象转换为<see cref="RedisValue"/>。
         /// </summary>
-        /// <param name="dateType">指定值是以何种方式存放在Redis上的。</param>
+        /// <param name="dataType">指定值是以何种方式存放在Redis上的。</param>
         /// <param name="value">待转换的对象。</param>
         /// <returns>转换后的<see cref="RedisValue"/>。</returns>
-        public static RedisValue ToRedisValue(RedisCacheDataType dateType, object value)
+        public static RedisValue ToRedisValue(RedisCacheDataType dataType, object value)
         {
             if (value == null)
                 return CacheEnv.NullValueString;
 
-            switch (dateType)
+            switch (dataType)
             {
                 case RedisCacheDataType.String:
                     return (string)value;
