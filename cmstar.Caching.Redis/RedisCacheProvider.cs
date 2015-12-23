@@ -14,11 +14,11 @@ namespace cmstar.Caching.Redis
         /// <summary>
         /// 初始化类型的新实例。
         /// </summary>
-        /// <param name="configuration">指定Redis的连接配置。</param>
+        /// <param name="connectionString">指定Redis的连接配置。</param>
         /// <param name="databaseNumber">指定缓存在Redis上使用的数据库编号。</param>
-        public RedisCacheProvider(string configuration, int databaseNumber = 0)
+        public RedisCacheProvider(string connectionString, int databaseNumber = 0)
         {
-            _redis = RedisConnectionCache.Get(configuration);
+            _redis = RedisConnectionCache.Get(connectionString);
             _databaseNumber = databaseNumber;
         }
 

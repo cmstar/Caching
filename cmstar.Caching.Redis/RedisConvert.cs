@@ -17,63 +17,63 @@ namespace cmstar.Caching.Redis
         /// <param name="dataType">指定值是以何种方式存放在Redis上的。</param>
         /// <param name="redisValue">待转换的<see cref="RedisValue"/>。</param>
         /// <returns>转换后的值。</returns>
-        public static object FromRedisValue<T>(RedisCacheDataType dataType, RedisValue redisValue)
+        public static object FromRedisValue<T>(RedisDataType dataType, RedisValue redisValue)
         {
             switch (dataType)
             {
-                case RedisCacheDataType.String:
+                case RedisDataType.String:
                     var v = (string)redisValue;
                     return v == CacheEnv.NullValueString ? null : v;
 
-                case RedisCacheDataType.Boolean:
+                case RedisDataType.Boolean:
                     return (bool)redisValue;
 
-                case RedisCacheDataType.Char:
+                case RedisDataType.Char:
                     return (char)redisValue;
 
-                case RedisCacheDataType.SByte:
+                case RedisDataType.SByte:
                     return (SByte)redisValue;
 
-                case RedisCacheDataType.Byte:
+                case RedisDataType.Byte:
                     return (byte)redisValue;
 
-                case RedisCacheDataType.Int16:
+                case RedisDataType.Int16:
                     return (short)redisValue;
 
-                case RedisCacheDataType.UInt16:
+                case RedisDataType.UInt16:
                     return (ushort)redisValue;
 
-                case RedisCacheDataType.Int32:
+                case RedisDataType.Int32:
                     return (int)redisValue;
 
-                case RedisCacheDataType.UInt32:
+                case RedisDataType.UInt32:
                     return (uint)redisValue;
 
-                case RedisCacheDataType.Int64:
+                case RedisDataType.Int64:
                     return (long)redisValue;
 
-                case RedisCacheDataType.UInt64:
+                case RedisDataType.UInt64:
                     return (ulong)redisValue;
 
-                case RedisCacheDataType.Single:
+                case RedisDataType.Single:
                     return (float)redisValue;
 
-                case RedisCacheDataType.Double:
+                case RedisDataType.Double:
                     return (double)redisValue;
 
-                case RedisCacheDataType.Decimal:
+                case RedisDataType.Decimal:
                     return Decimal.Parse(redisValue);
 
-                case RedisCacheDataType.DateTime:
+                case RedisDataType.DateTime:
                     return new DateTime((long)redisValue);
 
-                case RedisCacheDataType.DateTimeOffset:
+                case RedisDataType.DateTimeOffset:
                     return StringToDateTimeOffset(redisValue);
 
-                case RedisCacheDataType.DBNull:
+                case RedisDataType.DBNull:
                     return DBNull.Value;
 
-                case RedisCacheDataType.Guid:
+                case RedisDataType.Guid:
                     return new Guid((string)redisValue);
 
                 default:
@@ -91,65 +91,65 @@ namespace cmstar.Caching.Redis
         /// <param name="dataType">指定值是以何种方式存放在Redis上的。</param>
         /// <param name="value">待转换的对象。</param>
         /// <returns>转换后的<see cref="RedisValue"/>。</returns>
-        public static RedisValue ToRedisValue(RedisCacheDataType dataType, object value)
+        public static RedisValue ToRedisValue(RedisDataType dataType, object value)
         {
             if (value == null)
                 return CacheEnv.NullValueString;
 
             switch (dataType)
             {
-                case RedisCacheDataType.String:
+                case RedisDataType.String:
                     return (string)value;
 
-                case RedisCacheDataType.Boolean:
+                case RedisDataType.Boolean:
                     return (bool)value;
 
-                case RedisCacheDataType.Char:
+                case RedisDataType.Char:
                     return (char)value;
 
-                case RedisCacheDataType.SByte:
+                case RedisDataType.SByte:
                     return (SByte)value;
 
-                case RedisCacheDataType.Byte:
+                case RedisDataType.Byte:
                     return (byte)value;
 
-                case RedisCacheDataType.Int16:
+                case RedisDataType.Int16:
                     return (short)value;
 
-                case RedisCacheDataType.UInt16:
+                case RedisDataType.UInt16:
                     return (ushort)value;
 
-                case RedisCacheDataType.Int32:
+                case RedisDataType.Int32:
                     return (int)value;
 
-                case RedisCacheDataType.UInt32:
+                case RedisDataType.UInt32:
                     return (uint)value;
 
-                case RedisCacheDataType.Int64:
+                case RedisDataType.Int64:
                     return (long)value;
 
-                case RedisCacheDataType.UInt64:
+                case RedisDataType.UInt64:
                     return (ulong)value;
 
-                case RedisCacheDataType.Single:
+                case RedisDataType.Single:
                     return (float)value;
 
-                case RedisCacheDataType.Double:
+                case RedisDataType.Double:
                     return (double)value;
 
-                case RedisCacheDataType.Decimal:
+                case RedisDataType.Decimal:
                     return ((decimal)value).ToString(CultureInfo.InvariantCulture);
 
-                case RedisCacheDataType.DateTime:
+                case RedisDataType.DateTime:
                     return ((DateTime)value).Ticks;
 
-                case RedisCacheDataType.DateTimeOffset:
+                case RedisDataType.DateTimeOffset:
                     return DateTimeOffsetToString((DateTimeOffset)value);
 
-                case RedisCacheDataType.DBNull:
+                case RedisDataType.DBNull:
                     return String.Empty;
 
-                case RedisCacheDataType.Guid:
+                case RedisDataType.Guid:
                     return ((Guid)value).ToString("N");
 
                 default:
@@ -162,67 +162,67 @@ namespace cmstar.Caching.Redis
         /// </summary>
         /// <param name="type">CLR类型。</param>
         /// <returns>给定Redis上存储的方式。</returns>
-        public static RedisCacheDataType GetDataType(Type type)
+        public static RedisDataType GetDataType(Type type)
         {
             var typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
                 case TypeCode.DBNull:
-                    return RedisCacheDataType.DBNull;
+                    return RedisDataType.DBNull;
 
                 case TypeCode.Boolean:
-                    return RedisCacheDataType.Boolean;
+                    return RedisDataType.Boolean;
 
                 case TypeCode.Char:
-                    return RedisCacheDataType.Char;
+                    return RedisDataType.Char;
 
                 case TypeCode.SByte:
-                    return RedisCacheDataType.SByte;
+                    return RedisDataType.SByte;
 
                 case TypeCode.Byte:
-                    return RedisCacheDataType.Byte;
+                    return RedisDataType.Byte;
 
                 case TypeCode.Int16:
-                    return RedisCacheDataType.Int16;
+                    return RedisDataType.Int16;
 
                 case TypeCode.UInt16:
-                    return RedisCacheDataType.UInt16;
+                    return RedisDataType.UInt16;
 
                 case TypeCode.Int32:
-                    return RedisCacheDataType.Int32;
+                    return RedisDataType.Int32;
 
                 case TypeCode.UInt32:
-                    return RedisCacheDataType.UInt32;
+                    return RedisDataType.UInt32;
 
                 case TypeCode.Int64:
-                    return RedisCacheDataType.Int64;
+                    return RedisDataType.Int64;
 
                 case TypeCode.UInt64:
-                    return RedisCacheDataType.UInt64;
+                    return RedisDataType.UInt64;
 
                 case TypeCode.Single:
-                    return RedisCacheDataType.Single;
+                    return RedisDataType.Single;
 
                 case TypeCode.Double:
-                    return RedisCacheDataType.Double;
+                    return RedisDataType.Double;
 
                 case TypeCode.Decimal:
-                    return RedisCacheDataType.Decimal;
+                    return RedisDataType.Decimal;
 
                 case TypeCode.DateTime:
-                    return RedisCacheDataType.DateTime;
+                    return RedisDataType.DateTime;
 
                 case TypeCode.String:
-                    return RedisCacheDataType.String;
+                    return RedisDataType.String;
             }
 
             if (type == typeof(DateTimeOffset))
-                return RedisCacheDataType.DateTimeOffset;
+                return RedisDataType.DateTimeOffset;
 
             if (type == typeof(Guid))
-                return RedisCacheDataType.Guid;
+                return RedisDataType.Guid;
 
-            return RedisCacheDataType.Object;
+            return RedisDataType.Object;
         }
 
         private static string DateTimeOffsetToString(DateTimeOffset d)

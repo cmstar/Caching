@@ -3,7 +3,7 @@
     /// <summary>
     /// 定义CLR类型在Redis上存储的形态。
     /// </summary>
-    public enum RedisCacheDataType
+    public enum RedisDataType
     {
         // 需要多做一次序列化、反序列化处理的类型
         Object,
