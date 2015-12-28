@@ -7,7 +7,7 @@ namespace cmstar.Caching
     /// <summary>
     /// 基于<see cref="HttpRuntime"/>的缓存提供器实现。
     /// </summary>
-    public class HttpRuntimeCacheProvider : ICacheProvider
+    public class HttpRuntimeCacheProvider : MemoryBasedCacheProvider
     {
         /// <summary>
         /// 获取<see cref="HttpRuntimeCacheProvider"/>的唯一实例。
@@ -16,13 +16,13 @@ namespace cmstar.Caching
 
         private HttpRuntimeCacheProvider() { }
 
-        public T Get<T>(string key)
+        protected override T DoGet<T>(string key)
         {
             var v = HttpRuntime.Cache.Get(key);
             return v == null || ReferenceEquals(CacheEnv.NullValue, v) ? default(T) : (T)v;
         }
 
-        public bool TryGet<T>(string key, out T value)
+        protected override bool DoTryGet<T>(string key, out T value)
         {
             var v = HttpRuntime.Cache.Get(key);
 
@@ -36,7 +36,7 @@ namespace cmstar.Caching
             return true;
         }
 
-        public void Set<T>(string key, T value, TimeSpan expiration)
+        protected override void DoSet<T>(string key, T value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
                 ? DateTime.MaxValue
@@ -48,7 +48,7 @@ namespace cmstar.Caching
                 e, Cache.NoSlidingExpiration);
         }
 
-        public bool Remove(string key)
+        protected override bool DoRemove(string key)
         {
             return HttpRuntime.Cache.Remove(key) != null;
         }

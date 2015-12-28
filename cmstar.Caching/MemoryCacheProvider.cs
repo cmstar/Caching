@@ -6,7 +6,7 @@ namespace cmstar.Caching
     /// <summary>
     /// 基于<see cref="MemoryCache"/>的缓存提供器实现。
     /// </summary>
-    public class MemoryCacheProvider : ICacheProvider
+    public class MemoryCacheProvider : MemoryBasedCacheProvider
     {
         private readonly MemoryCache _cache;
 
@@ -19,13 +19,13 @@ namespace cmstar.Caching
             _cache = new MemoryCache(name);
         }
 
-        public T Get<T>(string key)
+        protected override T DoGet<T>(string key)
         {
             var v = _cache.Get(key);
             return v == null || ReferenceEquals(CacheEnv.NullValue, v) ? default(T) : (T)v;
         }
 
-        public bool TryGet<T>(string key, out T value)
+        protected override bool DoTryGet<T>(string key, out T value)
         {
             var v = _cache.Get(key);
 
@@ -39,7 +39,7 @@ namespace cmstar.Caching
             return true;
         }
 
-        public void Set<T>(string key, T value, TimeSpan expiration)
+        protected override void DoSet<T>(string key, T value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
                 ? ObjectCache.InfiniteAbsoluteExpiration
@@ -49,7 +49,7 @@ namespace cmstar.Caching
             _cache.Set(key, v ?? CacheEnv.NullValue, e);
         }
 
-        public bool Remove(string key)
+        protected override bool DoRemove(string key)
         {
             return _cache.Remove(key) != null;
         }
