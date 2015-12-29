@@ -314,7 +314,10 @@ namespace cmstar.Caching
 
         private InvalidOperationException InvalidOperationError()
         {
-            return new InvalidOperationException("The operation is not valid this cache provider.");
+            var msg = string.Format(
+                "The operation is not valid the cache provider {0}.",
+                _cacheManager.CacheProvider.GetType());
+            return new InvalidOperationException(msg);
         }
     }
 }
