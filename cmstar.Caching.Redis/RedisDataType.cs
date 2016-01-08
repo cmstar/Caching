@@ -5,15 +5,17 @@
     /// </summary>
     public enum RedisDataType
     {
-        // 需要多做一次序列化、反序列化处理的类型
+        // 使用复杂序列化，使用JSON表示的类型
         Object,
+
+        // 使用简单的序列化，能够用字符串表示的类型
         Guid,
         DateTime,
         DateTimeOffset,
         DBNull,
         Decimal,
 
-        // 能够直接以原始形式存储的类型
+        // 能够直接通过SE.Redis库存储的类型
         String,
         Boolean,
         Char,

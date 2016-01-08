@@ -53,6 +53,7 @@
     <Compile Include="RedisCacheProvider.cs" />
     <Compile Include="RedisConnectionCache.cs" />
     <Compile Include="RedisConvert.cs" />
+    <Compile Include="RedisHashCacheProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

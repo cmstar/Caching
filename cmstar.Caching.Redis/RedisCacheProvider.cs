@@ -40,8 +40,7 @@ namespace cmstar.Caching.Redis
                 return false;
             }
 
-            var dataType = RedisConvert.GetDataType(typeof(T));
-            var v = RedisConvert.FromRedisValue<T>(dataType, redisValue);
+            var v = RedisConvert.FromRedisValue<T>(redisValue);
             value = v == null ? default(T) : (T)v;
             return true;
         }
@@ -50,8 +49,7 @@ namespace cmstar.Caching.Redis
         {
             var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
             var db = _redis.GetDatabase(_databaseNumber);
-            var dataType = RedisConvert.GetDataType(typeof(T));
-            var redisValue = RedisConvert.ToRedisValue(dataType, value);
+            var redisValue = RedisConvert.ToRedisValue(value);
             db.StringSet(key, redisValue, e);
         }
 

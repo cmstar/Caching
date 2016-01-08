@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -8,8 +9,11 @@ namespace cmstar.Caching.Reflection
     /// <summary>
     /// 包含类型反射判断相关的方法。
     /// </summary>
-    internal static class ReflectionUtils
+    public static class ReflectionUtils
     {
+        private static readonly ConcurrentDictionary<Type, object> DefaultValues
+            = new ConcurrentDictionary<Type, object>();
+
         /// <summary>
         /// 判断给定类型是否可被赋值为null。
         /// </summary>
@@ -193,6 +197,27 @@ namespace cmstar.Caching.Reflection
                 return false;
 
             return type.Name.Contains("AnonymousType");
+        }
+
+        /// <summary>
+        /// 获取指定类型的默认值。效果同default(T)运算符。
+        /// 对于引用类型，默认值为null，对于值类型则为其零值。
+        /// </summary>
+        /// <param name="type">类型。</param>
+        /// <returns>类型的默认值。</returns>
+        public static object GetDefaultValue(Type type)
+        {
+            if (!type.IsValueType)
+                return null;
+
+            object value;
+            if (!DefaultValues.TryGetValue(type, out value))
+            {
+                value = Activator.CreateInstance(type);
+                DefaultValues.TryAdd(type, value);
+            }
+
+            return value;
         }
     }
 }
