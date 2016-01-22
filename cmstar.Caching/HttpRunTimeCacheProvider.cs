@@ -29,7 +29,7 @@ namespace cmstar.Caching
             if (v == null || ReferenceEquals(CacheEnv.NullValue, v))
             {
                 value = default(T);
-                return false;
+                return v != null;
             }
 
             value = (T)v;
@@ -41,11 +41,8 @@ namespace cmstar.Caching
             var e = TimeSpan.Zero.Equals(expiration)
                 ? DateTime.MaxValue
                 : DateTime.Now.Add(expiration);
-
-            object v = value;
-            HttpRuntime.Cache.Insert(
-                key, v ?? CacheEnv.NullValue, null,
-                e, Cache.NoSlidingExpiration);
+            var v = (object)value ?? CacheEnv.NullValue;
+            HttpRuntime.Cache.Insert(key, v, null, e, Cache.NoSlidingExpiration);
         }
 
         protected override bool DoRemove(string key)

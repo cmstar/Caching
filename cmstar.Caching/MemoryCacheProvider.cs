@@ -32,7 +32,7 @@ namespace cmstar.Caching
             if (v == null || ReferenceEquals(CacheEnv.NullValue, v))
             {
                 value = default(T);
-                return false;
+                return v != null;
             }
 
             value = (T)v;
