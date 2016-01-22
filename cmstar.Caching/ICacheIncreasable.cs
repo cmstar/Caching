@@ -8,7 +8,7 @@ namespace cmstar.Caching
     public interface ICacheIncreasable : ICacheProvider
     {
         /// <summary>
-        /// 当指定键的缓存存在时，将一个增量累加到该缓存对的值上。
+        /// 当指定键的缓存存在时，将一个增量累加到该缓存的值上。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <param name="key">缓存的键。</param>
@@ -17,7 +17,7 @@ namespace cmstar.Caching
         bool Increase<T>(string key, T increment);
 
         /// <summary>
-        /// 当指定键的缓存存在时，将一个增量累加到该缓存对的值上。
+        /// 当指定键的缓存存在时，将一个增量累加到该缓存的值上。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <param name="key">缓存的键。</param>
