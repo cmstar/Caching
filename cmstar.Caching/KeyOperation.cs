@@ -80,9 +80,10 @@ namespace cmstar.Caching
         /// <summary>
         /// 移除具有指定键的缓存。
         /// </summary>
-        public void Remove()
+        /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
+        public bool Remove()
         {
-            _cacheManager.CacheProvider.Remove(_key);
+            return _cacheManager.CacheProvider.Remove(_key);
         }
 
         /// <summary>

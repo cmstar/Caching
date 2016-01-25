@@ -38,6 +38,7 @@ namespace cmstar.Caching
         /// 移除具有指定键的缓存。
         /// </summary>
         /// <param name="key">缓存的键。</param>
+        /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
         bool Remove(string key);
     }
 }
