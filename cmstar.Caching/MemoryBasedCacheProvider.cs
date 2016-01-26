@@ -103,10 +103,15 @@ namespace cmstar.Caching
                 if (!DoTryGet(key, out tar))
                 {
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
-                    tar = (T)constructor();
-                    setter(tar, value);
-                    DoSet(key, tar, expiration);
-                    return false;
+
+                    /*
+                     * 对于TField是值类型的情况，这里使用object装箱，
+                     * 否则setter方法将接收其副本，从而导致赋值失败
+                     */
+                    var o = constructor();
+                    setter(o, value);
+                    DoSet(key, o, expiration);
+                    return true;
                 }
 
                 if (tar == null)
