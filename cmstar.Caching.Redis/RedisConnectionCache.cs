@@ -3,26 +3,20 @@ using StackExchange.Redis;
 
 namespace cmstar.Caching.Redis
 {
-    public static class RedisConnectionCache
+    internal static class RedisConnectionCache
     {
         private static readonly ConcurrentDictionary<string, ConnectionMultiplexer> Cache
             = new ConcurrentDictionary<string, ConnectionMultiplexer>();
 
         public static ConnectionMultiplexer Get(string configuration)
         {
-            ConnectionMultiplexer multiplexer;
-            if (Cache.TryGetValue(configuration, out multiplexer))
-                return multiplexer;
+            var multiplexer = Cache.GetOrAdd(configuration, CreateMultiplexer);
+            return multiplexer;
+        }
 
-            lock (Cache)
-            {
-                if (Cache.TryGetValue(configuration, out multiplexer))
-                    return multiplexer;
-
-                multiplexer = ConnectionMultiplexer.Connect(configuration);
-                Cache.TryAdd(configuration, multiplexer);
-            }
-
+        private static ConnectionMultiplexer CreateMultiplexer(string configuration)
+        {
+            var multiplexer = ConnectionMultiplexer.Connect(configuration);
             return multiplexer;
         }
     }
