@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>cmstar.Caching.Redis</RootNamespace>
+    <AssemblyName>cmstar.Caching.Redis.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RedisCacheProviderTests.cs" />
+    <Compile Include="RedisHashCacheProviderTests.cs" />
+    <Compile Include="RedisTestEnv.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\lib\StackExchange.Redis.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="..\cmstar.Caching.Redis\cmstar.Caching.Redis.csproj">
+      <Project>{8447e517-a328-464d-98b7-2f6490858604}</Project>
+      <Name>cmstar.Caching.Redis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cmstar.Caching.Tests\cmstar.Caching.Tests.csproj">
+      <Project>{818f7308-e215-4cb6-8bff-c91c92f8288b}</Project>
+      <Name>cmstar.Caching.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cmstar.Caching\cmstar.Caching.csproj">
+      <Project>{66a17ad3-9983-4b29-8db3-44218db9ed58}</Project>
+      <Name>cmstar.Caching</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

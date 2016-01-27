@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching", "cmstar.Ca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Redis", "cmstar.Caching.Redis\cmstar.Caching.Redis.csproj", "{8447E517-A328-464D-98B7-2F6490858604}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Tests", "cmstar.Caching.Tests\cmstar.Caching.Tests.csproj", "{818F7308-E215-4CB6-8BFF-C91C92F8288B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Redis.Tests", "cmstar.Caching.Redis.Tests\cmstar.Caching.Redis.Tests.csproj", "{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{8447E517-A328-464D-98B7-2F6490858604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8447E517-A328-464D-98B7-2F6490858604}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8447E517-A328-464D-98B7-2F6490858604}.Release|Any CPU.Build.0 = Release|Any CPU
+		{818F7308-E215-4CB6-8BFF-C91C92F8288B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{818F7308-E215-4CB6-8BFF-C91C92F8288B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{818F7308-E215-4CB6-8BFF-C91C92F8288B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{818F7308-E215-4CB6-8BFF-C91C92F8288B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
