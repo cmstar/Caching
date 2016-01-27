@@ -16,33 +16,18 @@ namespace cmstar.Caching
 
         private HttpRuntimeCacheProvider() { }
 
-        protected override T DoGet<T>(string key)
+        protected override object DoGet(string key)
         {
             var v = HttpRuntime.Cache.Get(key);
-            return v == null || ReferenceEquals(CacheEnv.NullValue, v) ? default(T) : (T)v;
+            return v;
         }
 
-        protected override bool DoTryGet<T>(string key, out T value)
-        {
-            var v = HttpRuntime.Cache.Get(key);
-
-            if (v == null || ReferenceEquals(CacheEnv.NullValue, v))
-            {
-                value = default(T);
-                return v != null;
-            }
-
-            value = (T)v;
-            return true;
-        }
-
-        protected override void DoSet<T>(string key, T value, TimeSpan expiration)
+        protected override void DoSet(string key, object value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
                 ? DateTime.MaxValue
                 : DateTime.Now.Add(expiration);
-            var v = (object)value ?? CacheEnv.NullValue;
-            HttpRuntime.Cache.Insert(key, v, null, e, Cache.NoSlidingExpiration);
+            HttpRuntime.Cache.Insert(key, value, null, e, Cache.NoSlidingExpiration);
         }
 
         protected override bool DoRemove(string key)

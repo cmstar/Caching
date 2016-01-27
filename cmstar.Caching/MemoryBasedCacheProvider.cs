@@ -14,30 +14,51 @@ namespace cmstar.Caching
 
         public T Get<T>(string key)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+
             using (_lock.Enter(key))
             {
-                return DoGet<T>(key);
+                var v = DoGet(key);
+                return v == null || ReferenceEquals(CacheEnv.NullValue, v)
+                    ? default(T)
+                    : (T)v;
             }
         }
 
         public bool TryGet<T>(string key, out T value)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+
             using (_lock.Enter(key))
             {
-                return DoTryGet(key, out value);
+                object v;
+                if (!InternalTryGet(key, out v))
+                {
+                    value = default(T);
+                    return false;
+                }
+
+                value = v == null || ReferenceEquals(CacheEnv.NullValue, v)
+                    ? default(T)
+                    : (T)v;
+                return true;
             }
         }
 
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+
             using (_lock.Enter(key))
             {
-                DoSet(key, value, expiration);
+                InternalSet(key, value, expiration);
             }
         }
 
         public bool Remove(string key)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+
             using (_lock.Enter(key))
             {
                 return DoRemove(key);
@@ -46,6 +67,9 @@ namespace cmstar.Caching
 
         public TField FieldGet<T, TField>(string key, string field)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(field, "field");
+
             TField value;
             FieldTryGet<T, TField>(key, field, out value);
             return value;
@@ -53,6 +77,9 @@ namespace cmstar.Caching
 
         public bool FieldTryGet<T, TField>(string key, string field, out TField value)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(field, "field");
+
             var getter = TypeMemberAccessorUtils.GetGetAccessor(typeof(T), field);
             if (getter == null)
             {
@@ -62,8 +89,8 @@ namespace cmstar.Caching
 
             using (_lock.Enter(key))
             {
-                T tar;
-                if (!DoTryGet(key, out tar) || tar == null)
+                object tar;
+                if (!InternalTryGet(key, out tar) || tar == null)
                 {
                     value = default(TField);
                     return false;
@@ -76,14 +103,17 @@ namespace cmstar.Caching
 
         public bool FieldSet<T, TField>(string key, string field, TField value)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(field, "field");
+
             var setter = TypeMemberAccessorUtils.GetSetAccessor(typeof(T), field);
             if (setter == null)
                 return false;
 
             using (_lock.Enter(key))
             {
-                T tar;
-                if (!DoTryGet(key, out tar) || tar == null)
+                object tar;
+                if (!InternalTryGet(key, out tar) || tar == null)
                     return false;
 
                 setter(tar, value);
@@ -93,24 +123,22 @@ namespace cmstar.Caching
 
         public bool FieldSetCx<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
+            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(field, "field");
+
             var setter = TypeMemberAccessorUtils.GetSetAccessor(typeof(T), field);
             if (setter == null)
                 return false;
 
             using (_lock.Enter(key))
             {
-                T tar;
-                if (!DoTryGet(key, out tar))
+                object tar;
+                if (!InternalTryGet(key, out tar))
                 {
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
-
-                    /*
-                     * 对于TField是值类型的情况，这里使用object装箱，
-                     * 否则setter方法将接收其副本，从而导致赋值失败
-                     */
-                    var o = constructor();
-                    setter(o, value);
-                    DoSet(key, o, expiration);
+                    tar = constructor();
+                    setter(tar, value);
+                    InternalSet(key, tar, expiration);
                     return true;
                 }
 
@@ -123,24 +151,38 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 提供<see cref="Get{T}"/>方法定义的对于缓存的操作的实际实现。
+        /// 从缓存中获取具有指定的键的值。若缓存键不存在，返回null。
         /// </summary>
-        protected abstract T DoGet<T>(string key);
+        protected abstract object DoGet(string key);
 
         /// <summary>
-        /// 提供<see cref="TryGet{T}"/>方法定义的对于缓存的操作的实际实现。
+        /// 将指定的键值存入缓存中，并设置其过期时间。<paramref name="value"/>不会为null。
         /// </summary>
-        protected abstract bool DoTryGet<T>(string key, out T value);
+        protected abstract void DoSet(string key, object value, TimeSpan expiration);
 
         /// <summary>
-        /// 提供<see cref="Set{T}"/>方法定义的对于缓存的操作的实际实现。
-        /// </summary>
-        protected abstract void DoSet<T>(string key, T value, TimeSpan expiration);
-
-        /// <summary>
-        /// 提供<see cref="Remove"/>方法定义的对于缓存的操作的实际实现。
+        /// 从缓存中移除指定的键。
         /// </summary>
         protected abstract bool DoRemove(string key);
+
+        private bool InternalTryGet(string key, out object value)
+        {
+            var v = DoGet(key);
+
+            if (v == null || ReferenceEquals(CacheEnv.NullValue, v))
+            {
+                value = null;
+                return v != null;
+            }
+
+            value = v;
+            return true;
+        }
+
+        private void InternalSet(string key, object value, TimeSpan expiration)
+        {
+            DoSet(key, value ?? CacheEnv.NullValue, expiration);
+        }
     }
 }
 
