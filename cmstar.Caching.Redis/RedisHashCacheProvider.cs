@@ -103,7 +103,13 @@ namespace cmstar.Caching.Redis
         {
             var redisValue = RedisConvert.ToRedisValue(value);
             var db = _redis.GetDatabase(_databaseNumber);
-            return db.HashSet(key, field, redisValue);
+
+            if (db.HashSet(key, field, redisValue))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return true;
         }
     }
 }
