@@ -80,8 +80,7 @@ namespace cmstar.Caching.Redis
                 return false;
             }
 
-            var v = RedisConvert.FromRedisValue<TField>(redisValue);
-            value = v == null ? default(TField) : (TField)v;
+            value = RedisConvert.FromRedisValue<TField>(redisValue);
             return true;
         }
 

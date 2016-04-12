@@ -108,9 +108,10 @@ namespace cmstar.Caching.Redis
         /// <typeparam name="T">转换后的目标类型。</typeparam>
         /// <param name="redisValue">待转换的<see cref="RedisValue"/>。</param>
         /// <returns>转换后的值，类型为<typeparamref name="T"/>。</returns>
-        public static object FromRedisValue<T>(RedisValue redisValue)
+        public static T FromRedisValue<T>(RedisValue redisValue)
         {
-            return FromRedisValue(redisValue, typeof(T));
+            var v = FromRedisValue(redisValue, typeof(T));
+            return v == null ? default(T) : (T)v;
         }
 
         /// <summary>

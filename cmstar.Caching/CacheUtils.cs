@@ -4,6 +4,9 @@ using System.Text;
 
 namespace cmstar.Caching
 {
+    /// <summary>
+    /// 提供了用于组装缓存键的辅助方法。
+    /// </summary>
     internal static class CacheUtils
     {
         /// <summary>
