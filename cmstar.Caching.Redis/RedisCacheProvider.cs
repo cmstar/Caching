@@ -8,7 +8,7 @@ namespace cmstar.Caching.Redis
     /// </summary>
     public class RedisCacheProvider : ICacheProvider
     {
-        private readonly ConnectionMultiplexer _redis;
+        private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
 
         /// <summary>

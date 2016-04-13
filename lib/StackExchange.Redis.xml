@@ -142,6 +142,239 @@
             Represents an inter-related group of connections to redis servers
             </summary>
         </member>
+        <member name="T:StackExchange.Redis.IConnectionMultiplexer">
+            <summary>
+            Represents the abstract multiplexer API
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.RegisterProfiler(StackExchange.Redis.IProfiler)">
+            <summary>
+            Sets an IProfiler instance for this ConnectionMultiplexer.
+            
+            An IProfiler instances is used to determine which context to associate an
+            IProfiledCommand with.  See BeginProfiling(object) and FinishProfiling(object)
+            for more details.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.BeginProfiling(System.Object)">
+            <summary>
+            Begins profiling for the given context.
+            
+            If the same context object is returned by the registered IProfiler, the IProfiledCommands
+            will be associated with each other.
+            
+            Call FinishProfiling with the same context to get the assocated commands.
+            
+            Note that forContext cannot be a WeakReference or a WeakReference&lt;T&gt;
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.FinishProfiling(System.Object,System.Boolean)">
+            <summary>
+            Stops profiling for the given context, returns all IProfiledCommands associated.
+            
+            By default this may do a sweep for dead profiling contexts, you can disable this by passing "allowCleanupSweep: false".
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetCounters">
+            <summary>
+            Get summary statistics associates with this server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetEndPoints(System.Boolean)">
+            <summary>
+            Gets all endpoints defined on the server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.Wait(System.Threading.Tasks.Task)">
+            <summary>
+            Wait for a given asynchronous operation to complete (or timeout)
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.Wait``1(System.Threading.Tasks.Task{``0})">
+            <summary>
+            Wait for a given asynchronous operation to complete (or timeout)
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.WaitAll(System.Threading.Tasks.Task[])">
+            <summary>
+            Wait for the given asynchronous operations to complete (or timeout)
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.HashSlot(StackExchange.Redis.RedisKey)">
+            <summary>
+            Compute the hash-slot of a specified key
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetSubscriber(System.Object)">
+            <summary>
+            Obtain a pub/sub subscriber connection to the specified server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetDatabase(System.Int32,System.Object)">
+            <summary>
+            Obtain an interactive connection to a database inside redis
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetServer(System.String,System.Int32,System.Object)">
+            <summary>
+            Obtain a configuration API for an individual server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetServer(System.String,System.Object)">
+            <summary>
+            Obtain a configuration API for an individual server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetServer(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Obtain a configuration API for an individual server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetServer(System.Net.EndPoint,System.Object)">
+            <summary>
+            Obtain a configuration API for an individual server
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.ConfigureAsync(System.IO.TextWriter)">
+            <summary>
+            Reconfigure the current connections based on the existing configuration
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.Configure(System.IO.TextWriter)">
+            <summary>
+            Reconfigure the current connections based on the existing configuration
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetStatus">
+            <summary>
+            Provides a text overview of the status of all connections
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetStatus(System.IO.TextWriter)">
+            <summary>
+            Provides a text overview of the status of all connections
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.ToString">
+            <summary>
+            See Object.ToString()
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.Close(System.Boolean)">
+            <summary>
+            Close all connections and release all resources associated with this object
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.CloseAsync(System.Boolean)">
+            <summary>
+            Close all connections and release all resources associated with this object
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.Dispose">
+            <summary>
+            Release all resources associated with this object
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.GetStormLog">
+            <summary>
+            Obtains the log of unusual busy patterns
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.ResetStormLog">
+            <summary>
+            Resets the log of unusual busy patterns
+            </summary>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.PublishReconfigure(StackExchange.Redis.CommandFlags)">
+            <summary>
+            Request all compatible clients to reconfigure or reconnect
+            </summary>
+            <returns>The number of instances known to have received the message (however, the actual number can be higher; returns -1 if the operation is pending)</returns>
+        </member>
+        <member name="M:StackExchange.Redis.IConnectionMultiplexer.PublishReconfigureAsync(StackExchange.Redis.CommandFlags)">
+            <summary>
+            Request all compatible clients to reconfigure or reconnect
+            </summary>
+            <returns>The number of instances known to have received the message (however, the actual number can be higher)</returns>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.ClientName">
+            <summary>
+            Gets the client-name that will be used on all new connections
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.Configuration">
+            <summary>
+            Gets the configuration of the connection
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.TimeoutMilliseconds">
+            <summary>
+            Gets the timeout associated with the connections
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.OperationCount">
+            <summary>
+            The number of operations that have been performed on all connections
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.PreserveAsyncOrder">
+            <summary>
+            Gets or sets whether asynchronous operations should be invoked in a way that guarantees their original delivery order
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.IsConnected">
+            <summary>
+            Indicates whether any servers are connected
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.IncludeDetailInExceptions">
+            <summary>
+            Should exceptions include identifiable details? (key names, additional .Data annotations)
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.IConnectionMultiplexer.StormLogThreshold">
+            <summary>
+            Limit at which to start recording unusual busy patterns (only one log will be retained at a time;
+            set to a negative value to disable this feature)
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.ErrorMessage">
+            <summary>
+            A server replied with an error message;
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.ConnectionFailed">
+            <summary>
+            Raised whenever a physical connection fails
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.InternalError">
+            <summary>
+            Raised whenever an internal error occurs (this is primarily for debugging)
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.ConnectionRestored">
+            <summary>
+            Raised whenever a physical connection is established
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.ConfigurationChanged">
+            <summary>
+            Raised when configuration changes are detected
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.ConfigurationChangedBroadcast">
+            <summary>
+            Raised when nodes are explicitly requested to reconfigure via broadcast;
+            this usually means master/slave changes
+            </summary>
+        </member>
+        <member name="E:StackExchange.Redis.IConnectionMultiplexer.HashSlotMoved">
+            <summary>
+            Raised when a hash-slot has been relocated
+            </summary>
+        </member>
         <member name="M:StackExchange.Redis.ConnectionMultiplexer.RegisterProfiler(StackExchange.Redis.IProfiler)">
             <summary>
             Sets an IProfiler instance for this ConnectionMultiplexer.
@@ -1551,7 +1784,7 @@
         </member>
         <member name="P:StackExchange.Redis.ConfigurationOptions.ClientName">
             <summary>
-            The client name to user for all connections
+            The client name to use for all connections
             </summary>
         </member>
         <member name="P:StackExchange.Redis.ConfigurationOptions.ConnectRetry">
@@ -4958,6 +5191,11 @@
         <member name="P:StackExchange.Redis.RedisFeatures.ScriptingDatabaseSafe">
             <summary>
             Are Lua changes to the calling database transparent to the calling client?
+            </summary>
+        </member>
+        <member name="P:StackExchange.Redis.RedisFeatures.HyperLogLogCountSlaveSafe">
+            <summary>
+            Is PFCOUNT supported on slaves?
             </summary>
         </member>
         <member name="P:StackExchange.Redis.RedisFeatures.Version">
