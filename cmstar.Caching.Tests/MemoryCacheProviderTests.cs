@@ -1,4 +1,5 @@
 ﻿using System;
+using NUnit.Framework;
 
 namespace cmstar.Caching
 {
@@ -6,6 +7,7 @@ namespace cmstar.Caching
     {
         private static readonly MemoryCacheProvider CacheInstance = new MemoryCacheProvider(Environment.MachineName);
 
+        [TestFixture]
         public class MemoryCacheProviderBasicTests : CacheProviderTestBase
         {
             protected override ICacheProvider CacheProvider
@@ -14,6 +16,7 @@ namespace cmstar.Caching
             }
         }
 
+        [TestFixture]
         public class MemoryCacheProviderFieldAccessableTests : CacheFieldAccessableTestBase
         {
             protected override ICacheFieldAccessable CacheProvider

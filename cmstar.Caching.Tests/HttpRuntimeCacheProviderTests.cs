@@ -1,7 +1,10 @@
-﻿namespace cmstar.Caching
+﻿using NUnit.Framework;
+
+namespace cmstar.Caching
 {
     public class HttpRuntimeCacheProviderTests
     {
+        [TestFixture]
         public class HttpRuntimeCacheProviderBasicTests : CacheProviderTestBase
         {
             protected override ICacheProvider CacheProvider
@@ -10,6 +13,7 @@
             }
         }
 
+        [TestFixture]
         public class HttpRuntimeCacheProviderFieldAccessableTests : CacheFieldAccessableTestBase
         {
             protected override ICacheFieldAccessable CacheProvider

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using NUnit.Framework;
 
 namespace cmstar.Caching
@@ -207,18 +208,53 @@ namespace cmstar.Caching
             };
 
             var expected = new CacheValueClass { IntField = -9866 };
-            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, int>(key, "IntField", expected.IntField, expiry));
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, int>(
+                key, "IntField", expected.IntField, expiry));
             assert(expected);
             CacheProvider.Remove(key);
 
             expected = new CacheValueClass { StringField = "jhfiw中文？" };
-            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, string>(key, "StringField", expected.StringField, expiry));
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, string>(
+                key, "StringField", expected.StringField, expiry));
             assert(expected);
             CacheProvider.Remove(key);
 
             expected = new CacheValueClass { StructField = CacheValueStruct.CloneSample() };
-            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, CacheValueStruct>(key, "StructField", expected.StructField, expiry));
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, CacheValueStruct>(
+                key, "StructField", expected.StructField, expiry));
             assert(expected);
+            CacheProvider.Remove(key);
+        }
+
+        [Test]
+        public void TestFieldSetCxForClassOnExistingKey()
+        {
+            var key = GetTempKey();
+            var expiry = TimeSpan.FromMinutes(5);
+            var expected = CacheValueClass.CloneSample();
+            PrepareValue(key, expected);
+
+            Action<CacheValueClass> assert = e =>
+            {
+                var val = CacheProvider.Get<CacheValueClass>(key);
+                Assert.AreEqual(e, val);
+            };
+
+            expected.IntField = -9866;
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, int>(
+                key, "IntField", expected.IntField, expiry));
+            assert(expected);
+
+            expected.StringField = "jhfiw中文？";
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, string>(
+                key, "StringField", expected.StringField, expiry));
+            assert(expected);
+
+            expected.StructField = CacheValueStruct.CloneSample();
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, CacheValueStruct>(
+                key, "StructField", expected.StructField, expiry));
+            assert(expected);
+
             CacheProvider.Remove(key);
         }
 
@@ -247,6 +283,70 @@ namespace cmstar.Caching
             expected = new CacheValueStruct { S = "wfef日本語" };
             Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueStruct, string>(key, "S", expected.S, expiry));
             assert(expected);
+            CacheProvider.Remove(key);
+        }
+
+        [Test]
+        public void TestFieldSetCxForStructOnExistingKey()
+        {
+            var key = GetTempKey();
+            var expiry = TimeSpan.FromMinutes(5);
+            var expected = CacheValueStruct.CloneSample();
+            PrepareValue(key, expected);
+
+            Action<CacheValueStruct> assert = e =>
+            {
+                var val = CacheProvider.Get<CacheValueStruct>(key);
+                Assert.AreEqual(e, val);
+            };
+
+            expected.D = 0.99M;
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueStruct, decimal>(key, "D", expected.D, expiry));
+            assert(expected);
+
+            expected.G = Guid.NewGuid();
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueStruct, Guid>(key, "G", expected.G, expiry));
+            assert(expected);
+
+            expected.S = "wfef日本語";
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueStruct, string>(key, "S", expected.S, expiry));
+            assert(expected);
+
+            CacheProvider.Remove(key);
+        }
+
+        [Test]
+        public void TestExpirationOnFieldSetCxForClass()
+        {
+            var key = GetTempKey();
+            var expiry = TimeSpan.FromSeconds(1);
+
+            var expected = new CacheValueClass { IntField = 996 };
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueClass, int>(key, "IntField", expected.IntField, expiry));
+            var val = CacheProvider.Get<CacheValueClass>(key);
+            Assert.AreEqual(expected, val);
+
+            Thread.Sleep(1100);
+            val = CacheProvider.Get<CacheValueClass>(key);
+            Assert.IsNull(val);
+            CacheProvider.Remove(key);
+        }
+
+        [Test]
+        public void TestExpirationOnFieldSetCxForStruct()
+        {
+            var key = GetTempKey();
+            var expiry = TimeSpan.FromSeconds(1);
+
+            var expected = new CacheValueStruct { G = Guid.NewGuid() };
+            Assert.IsTrue(CacheProvider.FieldSetCx<CacheValueStruct, Guid>(key, "G", expected.G, expiry));
+
+            var val = CacheProvider.Get<CacheValueStruct>(key);
+            Assert.AreEqual(expected, val);
+
+            Thread.Sleep(1100);
+            val = CacheProvider.Get<CacheValueStruct>(key);
+            Assert.AreEqual(new CacheValueStruct(), val);
             CacheProvider.Remove(key);
         }
 
