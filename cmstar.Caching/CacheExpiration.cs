@@ -71,7 +71,7 @@ namespace cmstar.Caching
 
             if (_randomRangeSeconds != 0)
             {
-                if (_randomRangeSeconds >= _baseExpirationSeconds)
+                if (_randomRangeSeconds < 0 || _randomRangeSeconds >= _baseExpirationSeconds)
                 {
                     var msg = string.Format(
                         "The random range {0}s is not valid (base expiration {1}s).",
