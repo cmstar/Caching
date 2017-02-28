@@ -87,7 +87,7 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.Increase{T}"/>方法。
+        /// 在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.Increase{T}(String, T)"/>方法。
         /// </summary>
         public bool Increase(TValue increment)
         {
@@ -97,17 +97,18 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.IncreaseGet{T}"/>方法。
+        /// 在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.Increase{T}(String, T, out T)"/>方法。
         /// </summary>
-        public bool IncreaseGet(TValue increment, out TValue result)
+        public bool Increase(TValue increment, out TValue result)
         {
             var provider = GetCacheIncreasableProvider();
-            var res = provider.IncreaseGet(_key, increment, out result);
+            var res = provider.Increase(_key, increment, out result);
             return res;
         }
 
         /// <summary>
-        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.IncreaseCx{T}"/>方法。
+        /// 使用默认的过期时间在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheIncreasable.IncreaseCx{T}(String, T, TimeSpan)"/>方法。
         /// </summary>
         public bool IncreaseCx(TValue increment)
         {
@@ -116,7 +117,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用指定的过期时间（秒）在当前对象所绑定的缓存上应用<see cref="ICacheIncreasable.IncreaseCx{T}"/>方法。
+        /// 使用指定的过期时间（秒）在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheIncreasable.IncreaseCx{T}(String, T, TimeSpan, out T)"/>方法。
         /// </summary>
         public bool IncreaseCx(TValue increment, int expirationSeconds)
         {
@@ -226,7 +228,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncrease{T,TField}"/>方法。
+        /// 在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncrease{T, TField}(String, String, TField)"/>方法。
         /// </summary>
         public bool FieldIncrease<TField>(string field, TField increment)
         {
@@ -236,7 +239,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncrease{T,TField}"/>方法。
+        /// 在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncrease{T, TField}(String, String, TField)"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
         public bool FieldIncrease<TField>(Expression<Func<TValue, TField>> selector, TField increment)
@@ -246,7 +250,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncreaseCx{T,TField}"/>方法。
+        /// 使用默认的过期时间在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// </summary>
         public bool FieldIncreaseCx<TField>(string field, TField increment)
         {
@@ -255,7 +260,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncreaseCx{T,TField}"/>方法。
+        /// 使用指定的过期时间在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// </summary>
         public bool FieldIncreaseCx<TField>(string field, TField increment, int expirationSeconds)
         {
@@ -266,7 +272,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncreaseCx{T,TField}"/>方法。
+        /// 使用默认的过期时间在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
         public bool FieldIncreaseCx<TField>(Expression<Func<TValue, TField>> selector, TField increment)
@@ -276,7 +283,8 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldIncreasable.FieldIncreaseCx{T,TField}"/>方法。
+        /// 使用指定的过期时间在当前对象所绑定的缓存上应用
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
         public object FieldIncreaseCx<TField>(

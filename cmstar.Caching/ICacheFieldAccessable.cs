@@ -32,7 +32,7 @@ namespace cmstar.Caching
         bool FieldTryGet<T, TField>(string key, string field, out TField value);
 
         /// <summary>
-        /// 设置具有指定键的缓存对象的指定字段的值。
+        /// 当指定键的缓存存在时，设置具有指定键的缓存对象的指定字段的值。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <typeparam name="TField">字段的数据类型。</typeparam>

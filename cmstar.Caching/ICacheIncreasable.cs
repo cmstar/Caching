@@ -24,7 +24,7 @@ namespace cmstar.Caching
         /// <param name="increment">增量。使用负数来做减法。</param>
         /// <param name="result">当成功设置了缓存值时，存放增加后的值。</param>
         /// <returns>true若对已存在的缓存对象进行了设值；否则返回false。</returns>
-        bool IncreaseGet<T>(string key, T increment, out T result);
+        bool Increase<T>(string key, T increment, out T result);
 
         /// <summary>
         /// 当指定键的缓存存在时，将一个增量累加到该缓存的值上。
@@ -55,6 +55,6 @@ namespace cmstar.Caching
         /// <returns>
         /// true若对已存在的缓存对象进行了设值；否则返回false，此时创建了新的缓存对象。
         /// </returns>
-        bool IncreaseGetCx<T>(string key, T increment, TimeSpan expiration, out T result);
+        bool IncreaseCx<T>(string key, T increment, TimeSpan expiration, out T result);
     }
 }
