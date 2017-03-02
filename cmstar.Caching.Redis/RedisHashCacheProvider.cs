@@ -45,15 +45,20 @@ namespace cmstar.Caching.Redis
 
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
-            var hashEntries = RedisConvert.ToHashEntries(value);
+            bool shouldRevmoveSpecialEntry;
+            var hashEntries = RedisConvert.ToHashEntries(value, out shouldRevmoveSpecialEntry);
             var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
             var db = _redis.GetDatabase(_databaseNumber);
             var tran = db.CreateTransaction();
 
-            var task1 = tran.HashSetAsync(key, hashEntries);
-            var task2 = tran.KeyExpireAsync(key, e);
+            if (shouldRevmoveSpecialEntry)
+            {
+                tran.HashDeleteAsync(key, RedisConvert.EntryNameForSpecialValue);
+            }
+
+            tran.HashSetAsync(key, hashEntries);
+            tran.KeyExpireAsync(key, e);
             tran.Execute();
-            tran.WaitAll(task1, task2);
         }
 
         public bool Remove(string key)
@@ -80,7 +85,8 @@ namespace cmstar.Caching.Redis
                 return false;
             }
 
-            value = RedisConvert.FromRedisValue<TField>(redisValue);
+            var v = RedisConvert.FromRedisValue<TField>(redisValue);
+            value = v == null ? default(TField) : (TField)v;
             return true;
         }
 
@@ -91,10 +97,8 @@ namespace cmstar.Caching.Redis
 
             var tran = db.CreateTransaction();
             tran.AddCondition(Condition.HashExists(key, field));
-            var t = tran.HashSetAsync(key, field, redisValue);
+            tran.HashSetAsync(key, field, redisValue);
             var res = tran.Execute();
-
-            tran.Wait(t);
             return res;
         }
 

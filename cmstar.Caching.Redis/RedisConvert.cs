@@ -15,33 +15,48 @@ namespace cmstar.Caching.Redis
     /// </summary>
     public static class RedisConvert
     {
-        /*
-         * 当对象不能被拆解为键值对存储在hash上时，仍要使用hash存储，则将字段序列化（为JSON），
-         * 以单一键值的形式存储，此时hash仅包含此字段。使用一个特殊的名称表示此字段
-         */
-        private const string EntryNameForNonObjects = "$<>__value";
+        /// <summary>
+        /// 当对象不能被拆解为键值对存储在hash上时，仍要使用hash存储，则将字段序列化（为JSON），
+        /// 以单一键值的形式存储，此时hash仅包含此字段。使用一个特殊的名称表示此字段。
+        /// </summary>
+        public const string EntryNameForSpecialValue = "$<>_..value";
 
         /// <summary>
         /// 将对象序列化到<see cref="HashEntry"/>的集合。
         /// </summary>
         /// <param name="obj">被序列化的对象。</param>
+        /// <param name="shouldRemoveSpecialEntry">
+        /// 指定在覆盖原有的entry时，是否需要先将<see cref="EntryNameForSpecialValue"/>域移除。
+        /// 因为该域与其他域互斥。
+        /// </param>
         /// <returns><see cref="HashEntry"/>的集合。</returns>
-        public static HashEntry[] ToHashEntries(object obj)
+        public static HashEntry[] ToHashEntries(object obj, out bool shouldRemoveSpecialEntry)
         {
+            /*
+             * 对于简单类型，其在hash上的值是直接存储在EntryNameForSpecialValue域上的；
+             * 复杂类型是将各个字段分别存在不同的域上的，但null和没有字段的类型（比如 new object()）除外，
+             * 对于这类值，使用EntryNameForSpecialValue域存，其中，null使用CacheEnv.NullValueString作为值，
+             * 没有字段的类型使用空字符串
+             */
+
+            shouldRemoveSpecialEntry = false;
             if (obj == null)
-                return new[] { new HashEntry(EntryNameForNonObjects, CacheEnv.NullValueString) };
+                return new[] { new HashEntry(EntryNameForSpecialValue, CacheEnv.NullValueString) };
 
             var type = obj.GetType();
             if (IsSimpleType(type))
             {
                 var redisValue = ToRedisValue(obj);
-                return new[] { new HashEntry(EntryNameForNonObjects, redisValue) };
+                return new[] { new HashEntry(EntryNameForSpecialValue, redisValue) };
             }
 
             var members = TypeMemberCache.GetMembers(type);
-            var entries = new HashEntry[members.Count];
-            var index = 0;
+            var count = members.Count;
+            if (count == 0)
+                return new[] { new HashEntry(EntryNameForSpecialValue, string.Empty) };
 
+            var entries = new HashEntry[count];
+            var index = 0;
             foreach (var member in members.Values)
             {
                 var value = member.Getter(obj);
@@ -51,6 +66,7 @@ namespace cmstar.Caching.Redis
                 index++;
             }
 
+            shouldRemoveSpecialEntry = true;
             return entries;
         }
 
@@ -75,31 +91,68 @@ namespace cmstar.Caching.Redis
         {
             if (IsSimpleType(type))
             {
+                // 对于简单类型，其在hash上的值是直接存储在EntryNameForSpecialValue域上的
                 foreach (var entry in entries)
                 {
-                    if (((string)entry.Name) != EntryNameForNonObjects)
+                    if (!EntryNameForSpecialValue.Equals(entry.Name))
                         continue;
 
                     var value = FromRedisValue(entry.Value, type);
                     return value;
                 }
+
+                // 没有找到EntryNameForSpecialValue域的情况，直接返回默认值
+                return ReflectionUtils.GetDefaultValue(type);
             }
 
-            var ctor = ConstructorInvokerGenerator.CreateDelegate(type);
-            var result = ctor();
-            var members = TypeMemberCache.GetMembers(type);
-
-            foreach (var entry in entries)
+            using (var itor = entries.GetEnumerator())
             {
-                TypeMember member;
-                if (!members.TryGetValue(entry.Name, out member))
-                    continue;
+                if (!itor.MoveNext())
+                    return ReflectionUtils.GetDefaultValue(type);
 
-                var value = FromRedisValue(entry.Value, member.Type);
-                member.Setter(result, value);
+                /*
+                 * 复杂类型是将各个字段分别存在不同的域上的，但null和没有字段的类型（比如 new object()）除外，
+                 * 对于这类值，使用EntryNameForSpecialValue域存，其中，null使用CacheEnv.NullValueString作为值，
+                 * 没有字段的类型使用空字符串；
+                 * 同时，EntryNameForSpecialValue域与其他字段域是互斥的，即有此域时，不能有其他字段
+                 */
+                var entry = itor.Current;
+                var isEmptyObject = false;
+                if (entry.Name == EntryNameForSpecialValue)
+                {
+                    if (CacheEnv.NullValueString.Equals(entry.Value))
+                        return null;
+
+                    if (string.Empty.Equals(entry.Value))
+                    {
+                        isEmptyObject = true;
+                    }
+                }
+
+                var ctor = ConstructorInvokerGenerator.CreateDelegate(type);
+                var result = ctor();
+
+                if (isEmptyObject)
+                    return result;
+
+                var members = TypeMemberCache.GetMembers(type);
+                while (true)
+                {
+                    TypeMember member;
+                    if (!members.TryGetValue(entry.Name, out member))
+                        continue;
+
+                    var value = FromRedisValue(entry.Value, member.Type);
+                    member.Setter(result, value);
+
+                    if (!itor.MoveNext())
+                        break;
+
+                    entry = itor.Current;
+                }
+
+                return result;
             }
-
-            return result;
         }
 
         /// <summary>
@@ -108,10 +161,9 @@ namespace cmstar.Caching.Redis
         /// <typeparam name="T">转换后的目标类型。</typeparam>
         /// <param name="redisValue">待转换的<see cref="RedisValue"/>。</param>
         /// <returns>转换后的值，类型为<typeparamref name="T"/>。</returns>
-        public static T FromRedisValue<T>(RedisValue redisValue)
+        public static object FromRedisValue<T>(RedisValue redisValue)
         {
-            var v = FromRedisValue(redisValue, typeof(T));
-            return v == null ? default(T) : (T)v;
+            return FromRedisValue(redisValue, typeof(T));
         }
 
         /// <summary>
@@ -154,22 +206,22 @@ namespace cmstar.Caching.Redis
                     return (uint)redisValue;
 
                 case TypeCode.Int64:
-                    return (long)redisValue;
+                    return long.Parse(redisValue);
 
                 case TypeCode.UInt64:
-                    return (ulong)redisValue;
+                    return ulong.Parse(redisValue);
 
                 case TypeCode.Single:
-                    return (float)redisValue;
+                    return float.Parse(redisValue);
 
                 case TypeCode.Double:
                     return (double)redisValue;
 
                 case TypeCode.Decimal:
-                    return Decimal.Parse(redisValue);
+                    return decimal.Parse(redisValue);
 
                 case TypeCode.DateTime:
-                    return new DateTime((long)redisValue);
+                    return new DateTime(long.Parse(redisValue));
 
                 case TypeCode.DBNull:
                     return DBNull.Value;
@@ -189,81 +241,6 @@ namespace cmstar.Caching.Redis
         }
 
         /// <summary>
-        /// 将<see cref="RedisValue"/>转换为指定的CLR类型的实例。
-        /// </summary>
-        /// <typeparam name="T">转换后的目标类型。</typeparam>
-        /// <param name="dataType">指定值是以何种方式存放在Redis上的。</param>
-        /// <param name="redisValue">待转换的<see cref="RedisValue"/>。</param>
-        /// <returns>转换后的值。</returns>
-        public static object FromRedisValue<T>(RedisDataType dataType, RedisValue redisValue)
-        {
-            switch (dataType)
-            {
-                case RedisDataType.String:
-                    var v = (string)redisValue;
-                    return v == CacheEnv.NullValueString ? null : v;
-
-                case RedisDataType.Boolean:
-                    return (bool)redisValue;
-
-                case RedisDataType.Char:
-                    return (char)redisValue;
-
-                case RedisDataType.SByte:
-                    return (SByte)redisValue;
-
-                case RedisDataType.Byte:
-                    return (byte)redisValue;
-
-                case RedisDataType.Int16:
-                    return (short)redisValue;
-
-                case RedisDataType.UInt16:
-                    return (ushort)redisValue;
-
-                case RedisDataType.Int32:
-                    return (int)redisValue;
-
-                case RedisDataType.UInt32:
-                    return (uint)redisValue;
-
-                case RedisDataType.Int64:
-                    return (long)redisValue;
-
-                case RedisDataType.UInt64:
-                    return (ulong)redisValue;
-
-                case RedisDataType.Single:
-                    return (float)redisValue;
-
-                case RedisDataType.Double:
-                    return (double)redisValue;
-
-                case RedisDataType.Decimal:
-                    return Decimal.Parse(redisValue);
-
-                case RedisDataType.DateTime:
-                    return new DateTime((long)redisValue);
-
-                case RedisDataType.DateTimeOffset:
-                    return StringToDateTimeOffset(redisValue);
-
-                case RedisDataType.DBNull:
-                    return DBNull.Value;
-
-                case RedisDataType.Guid:
-                    return new Guid((string)redisValue);
-
-                default:
-                    var stringValue = redisValue;
-                    if (CacheEnv.NullValueString.Equals(stringValue))
-                        return default(T);
-
-                    return JsonSerializer.Default.Deserialize<T>(stringValue);
-            }
-        }
-
-        /// <summary>
         /// 将给定的对象转换为<see cref="RedisValue"/>。
         /// </summary>
         /// <param name="value">待转换的对象。</param>
@@ -273,6 +250,11 @@ namespace cmstar.Caching.Redis
             if (value == null)
                 return CacheEnv.NullValueString;
 
+            /*
+             * CLR数值类型在RedisValue中也以数值类型（整数或浮点）的方式处理，
+             * 然而redis数值是有符号的64位，不能表示ulong和decimal中超出其可存储范围的部分，
+             * 对于这部分类型，直接ToString处理，避免RedisValue将其作为数值处理从而导致值溢出或精度损失
+             */
             var type = value.GetType();
             var typeCode = Type.GetTypeCode(type);
             switch (typeCode)
@@ -307,7 +289,7 @@ namespace cmstar.Caching.Redis
                     return (long)value;
 
                 case TypeCode.UInt64:
-                    return (ulong)value;
+                    return ((ulong)value).ToString(CultureInfo.InvariantCulture);
 
                 case TypeCode.Single:
                     return (float)value;
@@ -332,78 +314,6 @@ namespace cmstar.Caching.Redis
                 return ((Guid)value).ToString("N");
 
             return JsonSerializer.Default.FastSerialize(value);
-        }
-
-        /// <summary>
-        /// 将给定的对象转换为<see cref="RedisValue"/>。
-        /// </summary>
-        /// <param name="dataType">指定值是以何种方式存放在Redis上的。</param>
-        /// <param name="value">待转换的对象。</param>
-        /// <returns>转换后的<see cref="RedisValue"/>。</returns>
-        public static RedisValue ToRedisValue(RedisDataType dataType, object value)
-        {
-            if (value == null)
-                return CacheEnv.NullValueString;
-
-            switch (dataType)
-            {
-                case RedisDataType.String:
-                    return (string)value;
-
-                case RedisDataType.Boolean:
-                    return (bool)value;
-
-                case RedisDataType.Char:
-                    return (char)value;
-
-                case RedisDataType.SByte:
-                    return (SByte)value;
-
-                case RedisDataType.Byte:
-                    return (byte)value;
-
-                case RedisDataType.Int16:
-                    return (short)value;
-
-                case RedisDataType.UInt16:
-                    return (ushort)value;
-
-                case RedisDataType.Int32:
-                    return (int)value;
-
-                case RedisDataType.UInt32:
-                    return (uint)value;
-
-                case RedisDataType.Int64:
-                    return (long)value;
-
-                case RedisDataType.UInt64:
-                    return (ulong)value;
-
-                case RedisDataType.Single:
-                    return (float)value;
-
-                case RedisDataType.Double:
-                    return (double)value;
-
-                case RedisDataType.Decimal:
-                    return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-
-                case RedisDataType.DateTime:
-                    return ((DateTime)value).Ticks;
-
-                case RedisDataType.DateTimeOffset:
-                    return DateTimeOffsetToString((DateTimeOffset)value);
-
-                case RedisDataType.DBNull:
-                    return String.Empty;
-
-                case RedisDataType.Guid:
-                    return ((Guid)value).ToString("N");
-
-                default:
-                    return JsonSerializer.Default.FastSerialize(value);
-            }
         }
 
         /// <summary>
