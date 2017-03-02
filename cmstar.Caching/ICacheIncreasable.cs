@@ -1,60 +1,33 @@
-using System;
+ï»¿using System;
 
 namespace cmstar.Caching
 {
     /// <summary>
-    /// ¶¨ÒåÒ»×é·½·¨£¬ÓÃÓÚ¶ÔÊýÖµÐÍµÄ»º´æÖµ½øÐÐÔö¼õ²Ù×÷¡£
+    /// å®šä¹‰ä¸€ç»„æ–¹æ³•ï¼Œç”¨äºŽå¯¹æ•°å€¼åž‹çš„ç¼“å­˜å€¼è¿›è¡Œå¢žå‡æ“ä½œã€‚
     /// </summary>
     public interface ICacheIncreasable : ICacheProvider
     {
         /// <summary>
-        /// µ±Ö¸¶¨¼üµÄ»º´æ´æÔÚÊ±£¬½«Ò»¸öÔöÁ¿ÀÛ¼Óµ½¸Ã»º´æµÄÖµÉÏ¡£
+        /// å½“æŒ‡å®šé”®çš„ç¼“å­˜å­˜åœ¨æ—¶ï¼Œå°†ä¸€ä¸ªå¢žé‡ç´¯åŠ åˆ°è¯¥ç¼“å­˜çš„å€¼ä¸Šã€‚
         /// </summary>
-        /// <typeparam name="T">»º´æ¶ÔÏóµÄÀàÐÍ¡£</typeparam>
-        /// <param name="key">»º´æµÄ¼ü¡£</param>
-        /// <param name="increment">ÔöÁ¿¡£Ê¹ÓÃ¸ºÊýÀ´×ö¼õ·¨¡£</param>
-        /// <returns>trueÈô¶ÔÒÑ´æÔÚµÄ»º´æ¶ÔÏó½øÐÐÁËÉèÖµ£»·ñÔò·µ»Øfalse¡£</returns>
-        bool Increase<T>(string key, T increment);
+        /// <typeparam name="T">ç¼“å­˜å¯¹è±¡çš„ç±»åž‹ã€‚</typeparam>
+        /// <param name="key">ç¼“å­˜çš„é”®ã€‚</param>
+        /// <param name="increment">å¢žé‡ã€‚ä½¿ç”¨è´Ÿæ•°æ¥åšå‡æ³•ã€‚</param>
+        /// <returns>æŒ‡å®šé”®çš„ç¼“å­˜å­˜åœ¨æ—¶ï¼Œè¿”å›žå¢žåŠ åŽçš„å€¼ï¼›å¦åˆ™è¿”å›ž<typeparamref name="T"/>çš„é»˜è®¤å€¼ã€‚</returns>
+        T Increase<T>(string key, T increment);
 
         /// <summary>
-        /// µ±Ö¸¶¨¼üµÄ»º´æ´æÔÚÊ±£¬½«Ò»¸öÔöÁ¿ÀÛ¼Óµ½¸Ã»º´æµÄÖµÉÏ¡£
+        /// å½“æŒ‡å®šé”®çš„ç¼“å­˜å­˜åœ¨æ—¶ï¼Œå°†ä¸€ä¸ªå¢žé‡ç´¯åŠ åˆ°è¯¥ç¼“å­˜çš„å€¼ä¸Šã€‚
+        /// è‹¥ç¼“å­˜ä¸å­˜åœ¨ï¼Œåˆ™åˆå§‹åŒ–å…¶å€¼ä¸ºå¢žé‡å€¼ã€‚
         /// </summary>
-        /// <typeparam name="T">»º´æ¶ÔÏóµÄÀàÐÍ¡£</typeparam>
-        /// <param name="key">»º´æµÄ¼ü¡£</param>
-        /// <param name="increment">ÔöÁ¿¡£Ê¹ÓÃ¸ºÊýÀ´×ö¼õ·¨¡£</param>
-        /// <param name="result">µ±³É¹¦ÉèÖÃÁË»º´æÖµÊ±£¬´æ·ÅÔö¼ÓºóµÄÖµ¡£</param>
-        /// <returns>trueÈô¶ÔÒÑ´æÔÚµÄ»º´æ¶ÔÏó½øÐÐÁËÉèÖµ£»·ñÔò·µ»Øfalse¡£</returns>
-        bool Increase<T>(string key, T increment, out T result);
-
-        /// <summary>
-        /// µ±Ö¸¶¨¼üµÄ»º´æ´æÔÚÊ±£¬½«Ò»¸öÔöÁ¿ÀÛ¼Óµ½¸Ã»º´æµÄÖµÉÏ¡£
-        /// Èô»º´æ²»´æÔÚ£¬Ôò³õÊ¼»¯ÆäÖµÎªÔöÁ¿Öµ¡£
-        /// </summary>
-        /// <typeparam name="T">»º´æ¶ÔÏóµÄÀàÐÍ¡£</typeparam>
-        /// <param name="key">»º´æµÄ¼ü¡£</param>
-        /// <param name="increment">ÔöÁ¿¡£Ê¹ÓÃ¸ºÊýÀ´×ö¼õ·¨¡£</param>
+        /// <typeparam name="T">ç¼“å­˜å¯¹è±¡çš„ç±»åž‹ã€‚</typeparam>
+        /// <param name="key">ç¼“å­˜çš„é”®ã€‚</param>
+        /// <param name="increment">å¢žé‡ã€‚ä½¿ç”¨è´Ÿæ•°æ¥åšå‡æ³•ã€‚</param>
         /// <param name="expiration">
-        /// Ö¸¶¨±»´´½¨µÄ»º´æ¶ÔÏóµÄ¹ýÆÚÊ±¼ä¡£Ê¹ÓÃ<see cref="TimeSpan.Zero"/>±íÊ¾»º´æ²»»á¹ýÆÚ¡£
+        /// æŒ‡å®šè¢«åˆ›å»ºçš„ç¼“å­˜å¯¹è±¡çš„è¿‡æœŸæ—¶é—´ã€‚ä½¿ç”¨<see cref="TimeSpan.Zero"/>è¡¨ç¤ºç¼“å­˜ä¸ä¼šè¿‡æœŸã€‚
         /// </param>
-        /// <returns>
-        /// trueÈô¶ÔÒÑ´æÔÚµÄ»º´æ¶ÔÏó½øÐÐÁËÉèÖµ£»·ñÔò·µ»Øfalse£¬´ËÊ±´´½¨ÁËÐÂµÄ»º´æ¶ÔÏó¡£
-        /// </returns>
-        bool IncreaseCx<T>(string key, T increment, TimeSpan expiration);
-
-        /// <summary>
-        /// µ±Ö¸¶¨¼üµÄ»º´æ´æÔÚÊ±£¬½«Ò»¸öÔöÁ¿ÀÛ¼Óµ½¸Ã»º´æµÄÖµÉÏ¡£
-        /// Èô»º´æ²»´æÔÚ£¬Ôò³õÊ¼»¯ÆäÖµÎªÔöÁ¿Öµ¡£
-        /// </summary>
-        /// <typeparam name="T">»º´æ¶ÔÏóµÄÀàÐÍ¡£</typeparam>
-        /// <param name="key">»º´æµÄ¼ü¡£</param>
-        /// <param name="increment">ÔöÁ¿¡£Ê¹ÓÃ¸ºÊýÀ´×ö¼õ·¨¡£</param>
-        /// <param name="expiration">
-        /// Ö¸¶¨±»´´½¨µÄ»º´æ¶ÔÏóµÄ¹ýÆÚÊ±¼ä¡£Ê¹ÓÃ<see cref="TimeSpan.Zero"/>±íÊ¾»º´æ²»»á¹ýÆÚ¡£
-        /// </param>
-        /// <param name="result">´æ·ÅÔö¼ÓºóµÄÖµ¡£</param>
-        /// <returns>
-        /// trueÈô¶ÔÒÑ´æÔÚµÄ»º´æ¶ÔÏó½øÐÐÁËÉèÖµ£»·ñÔò·µ»Øfalse£¬´ËÊ±´´½¨ÁËÐÂµÄ»º´æ¶ÔÏó¡£
-        /// </returns>
-        bool IncreaseCx<T>(string key, T increment, TimeSpan expiration, out T result);
+        /// <returns>è¿”å›žå¢žåŠ ï¼ˆç¼“å­˜ä¸å­˜åœ¨æ—¶ä¸ºæ–°å»ºï¼‰åŽçš„å€¼ã€‚</returns>
+        /// <remarks>'Cx' means 'Create if not eXists'.</remarks>
+        T IncreaseCx<T>(string key, T increment, TimeSpan expiration);
     }
 }
