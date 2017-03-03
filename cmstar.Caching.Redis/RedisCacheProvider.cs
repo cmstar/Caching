@@ -6,7 +6,7 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 使用Redis作为缓存的缓存提供器。
     /// </summary>
-    public class RedisCacheProvider : ICacheProvider
+    public class RedisCacheProvider : ICacheIncreasable
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -57,6 +57,40 @@ namespace cmstar.Caching.Redis
         {
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDelete(key);
+        }
+
+        public T Increase<T>(string key, T increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+
+            var res = tran.StringIncrementAsync(key, incrementLong);
+            return tran.Execute()
+                ? (T)Convert.ChangeType(res.Result, typeof(T))
+                : default(T);
+        }
+
+        public T IncreaseCx<T>(string key, T increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = db.StringIncrement(key, incrementLong);
+
+            /*
+             * redis的INCR*命令本身没有提供仅在新建值的时候设置过期时间的机制，
+             * 这里分两步处理，先INCR*；然后判定如果是新建的值，就设置过期时间。
+             * 然而INCR*仅返回当前的值，不说明值是新建的还是更新的，我们等通过
+             * 返回的值是否与增量一致来判断是否是新建的。
+             */
+            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return (T)Convert.ChangeType(res, typeof(T));
         }
     }
 }

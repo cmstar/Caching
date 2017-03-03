@@ -6,7 +6,7 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 基于redis的hash实现的缓存提供器。
     /// </summary>
-    public class RedisHashCacheProvider : ICacheFieldAccessable
+    public class RedisHashCacheProvider : ICacheFieldAccessable, ICacheIncreasable
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -45,13 +45,13 @@ namespace cmstar.Caching.Redis
 
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
-            bool shouldRevmoveSpecialEntry;
-            var hashEntries = RedisConvert.ToHashEntries(value, out shouldRevmoveSpecialEntry);
+            bool shouldRemoveSpecialEntry;
+            var hashEntries = RedisConvert.ToHashEntries(value, out shouldRemoveSpecialEntry);
             var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
             var db = _redis.GetDatabase(_databaseNumber);
             var tran = db.CreateTransaction();
 
-            if (shouldRevmoveSpecialEntry)
+            if (shouldRemoveSpecialEntry)
             {
                 tran.HashDeleteAsync(key, RedisConvert.EntryNameForSpecialValue);
             }
@@ -65,6 +65,33 @@ namespace cmstar.Caching.Redis
         {
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDelete(key);
+        }
+
+        public T Increase<T>(string key, T increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+            var res = tran.HashIncrementAsync(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
+            return tran.Execute()
+                ? (T)Convert.ChangeType(res.Result, typeof(T))
+                : default(T);
+        }
+
+        public T IncreaseCx<T>(string key, T increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = db.HashIncrement(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
+
+            // 超时的处理采用和RedisCacheProvider.IncreaseCx相同的方式
+            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return (T)Convert.ChangeType(res, typeof(T));
         }
 
         public TField FieldGet<T, TField>(string key, string field)
