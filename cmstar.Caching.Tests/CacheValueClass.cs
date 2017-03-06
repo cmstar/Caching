@@ -9,7 +9,10 @@ namespace cmstar.Caching
         private static readonly CacheValueClass Sample = new CacheValueClass
         {
             DateTimeField = DateTime.Now,
+            LongField = 589962545522,
             IntField = 55,
+            ShortField = 12345,
+            ByteField = 33,
             StringField = "abc",
             StructField = CacheValueStruct.CloneSample(),
             ArrayField = new[] { -55, 0, 0, 11 }
@@ -21,7 +24,10 @@ namespace cmstar.Caching
         }
 
         public string StringField;
+        public long LongField;
         public int IntField;
+        public short ShortField;
+        public byte ByteField;
         public DateTime DateTimeField;
         public IList<int> ArrayField;
         public CacheValueStruct StructField;
@@ -30,7 +36,10 @@ namespace cmstar.Caching
         {
             if (other == null
                 || other.StringField != StringField
+                || other.LongField != LongField
                 || other.IntField != IntField
+                || other.ShortField != ShortField
+                || other.ByteField != ByteField
                 || other.DateTimeField != DateTimeField
                 || !other.StructField.Equals(StructField))
             {

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheFieldAccessableTestBase.cs" />
+    <Compile Include="CacheFieldIncreasableTestBase.cs" />
     <Compile Include="CacheIncreasableTestBase.cs" />
     <Compile Include="CacheProviderTestBase.cs" />
     <Compile Include="CacheValueClass.cs" />
