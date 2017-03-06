@@ -79,13 +79,13 @@ namespace cmstar.Caching.Redis
                 : default(T);
         }
 
-        public T IncreaseCx<T>(string key, T increment, TimeSpan expiration)
+        public T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var res = db.HashIncrement(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
 
-            // 超时的处理采用和RedisCacheProvider.IncreaseCx相同的方式
+            // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
             if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
             {
                 db.KeyExpire(key, expiration);
@@ -129,7 +129,7 @@ namespace cmstar.Caching.Redis
             return res;
         }
 
-        public bool FieldSetCx<T, TField>(string key, string field, TField value, TimeSpan expiration)
+        public bool FieldSetOrCreate<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
             var redisValue = RedisConvert.ToRedisValue(value);
             var db = _redis.GetDatabase(_databaseNumber);

@@ -121,7 +121,7 @@ namespace cmstar.Caching
             }
         }
 
-        public bool FieldSetCx<T, TField>(string key, string field, TField value, TimeSpan expiration)
+        public bool FieldSetOrCreate<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
             ArgAssert.NotNullOrEmpty(key, "key");
             ArgAssert.NotNullOrEmpty(field, "field");

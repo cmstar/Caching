@@ -73,7 +73,7 @@ namespace cmstar.Caching.Redis
                 : default(T);
         }
 
-        public T IncreaseCx<T>(string key, T increment, TimeSpan expiration)
+        public T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);

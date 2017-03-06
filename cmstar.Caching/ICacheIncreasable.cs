@@ -29,7 +29,6 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>返回增加（缓存不存在时为新建）后的值。</returns>
-        /// <remarks>'Cx' means 'Create if not eXists'.</remarks>
-        T IncreaseCx<T>(string key, T increment, TimeSpan expiration);
+        T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration);
     }
 }

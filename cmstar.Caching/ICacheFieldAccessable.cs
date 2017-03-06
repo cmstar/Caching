@@ -55,7 +55,6 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>true若成功设置了字段值，或创建了缓存对象或字段；否则返回false。</returns>
-        /// <remarks>'Cx' means 'Create if not eXists'.</remarks>
-        bool FieldSetCx<T, TField>(string key, string field, TField value, TimeSpan expiration);
+        bool FieldSetOrCreate<T, TField>(string key, string field, TField value, TimeSpan expiration);
     }
 }

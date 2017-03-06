@@ -97,23 +97,23 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 使用默认的过期时间在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheIncreasable.IncreaseCx{T}(String, T, TimeSpan)"/>方法。
+        /// <see cref="ICacheIncreasable.IncreaseOrCreate{T}(String, T, TimeSpan)"/>方法。
         /// </summary>
-        public TValue IncreaseCx(TValue increment)
+        public TValue IncreaseOrCreate(TValue increment)
         {
             var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
-            return IncreaseCx(increment, expirationSeconds);
+            return IncreaseOrCreate(increment, expirationSeconds);
         }
 
         /// <summary>
         /// 使用指定的过期时间（秒）在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheIncreasable.IncreaseCx{T}(String, T, TimeSpan)"/>方法。
+        /// <see cref="ICacheIncreasable.IncreaseOrCreate{T}(String, T, TimeSpan)"/>方法。
         /// </summary>
-        public TValue IncreaseCx(TValue increment, int expirationSeconds)
+        public TValue IncreaseOrCreate(TValue increment, int expirationSeconds)
         {
             var provider = GetCacheIncreasableProvider();
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.IncreaseCx(_key, increment, expiration);
+            var res = provider.IncreaseOrCreate(_key, increment, expiration);
             return res;
         }
 
@@ -177,43 +177,43 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetCx{T,TField}"/>方法。
+        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}"/>方法。
         /// </summary>
-        public bool FieldSetCx<TField>(string field, TField value)
+        public bool FieldSetOrCreate<TField>(string field, TField value)
         {
             var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
-            return FieldSetCx(field, value, expirationSeconds);
+            return FieldSetOrCreate(field, value, expirationSeconds);
         }
 
         /// <summary>
-        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetCx{T,TField}"/>方法。
+        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}"/>方法。
         /// </summary>
-        public bool FieldSetCx<TField>(string field, TField value, int expirationSeconds)
+        public bool FieldSetOrCreate<TField>(string field, TField value, int expirationSeconds)
         {
             var provider = GetCacheFieldAccessableProvider();
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldSetCx<TValue, TField>(_key, field, value, expiration);
+            var res = provider.FieldSetOrCreate<TValue, TField>(_key, field, value, expiration);
             return res;
         }
 
         /// <summary>
-        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetCx{T,TField}"/>方法。
+        /// 使用默认的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
-        public bool FieldSetCx<TField>(Expression<Func<TValue, TField>> selector, TField value)
+        public bool FieldSetOrCreate<TField>(Expression<Func<TValue, TField>> selector, TField value)
         {
             var name = ReflectionUtils.GetMemberName(selector);
-            return FieldSetCx(name, value);
+            return FieldSetOrCreate(name, value);
         }
 
         /// <summary>
-        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetCx{T,TField}"/>方法。
+        /// 使用指定的过期时间在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
-        public bool FieldSetCx<TField>(Expression<Func<TValue, TField>> selector, TField value, int expirationSeconds)
+        public bool FieldSetOrCreate<TField>(Expression<Func<TValue, TField>> selector, TField value, int expirationSeconds)
         {
             var name = ReflectionUtils.GetMemberName(selector);
-            return FieldSetCx(name, value, expirationSeconds);
+            return FieldSetOrCreate(name, value, expirationSeconds);
         }
 
         /// <summary>
@@ -239,48 +239,48 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 使用默认的过期时间在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseOrCreate{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// </summary>
-        public TField FieldIncreaseCx<TField>(string field, TField increment)
+        public TField FieldIncreaseOrCreate<TField>(string field, TField increment)
         {
             var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
-            var res = FieldIncreaseCx(field, increment, expirationSeconds);
+            var res = FieldIncreaseOrCreate(field, increment, expirationSeconds);
             return res;
         }
 
         /// <summary>
         /// 使用指定的过期时间在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseOrCreate{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// </summary>
-        public TField FieldIncreaseCx<TField>(string field, TField increment, int expirationSeconds)
+        public TField FieldIncreaseOrCreate<TField>(string field, TField increment, int expirationSeconds)
         {
             var provider = GetCacheFieldIncreasableProvider();
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldIncreaseCx<TValue, TField>(_key, field, increment, expiration);
+            var res = provider.FieldIncreaseOrCreate<TValue, TField>(_key, field, increment, expiration);
             return res;
         }
 
         /// <summary>
         /// 使用默认的过期时间在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseOrCreate{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
-        public TField FieldIncreaseCx<TField>(Expression<Func<TValue, TField>> selector, TField increment)
+        public TField FieldIncreaseOrCreate<TField>(Expression<Func<TValue, TField>> selector, TField increment)
         {
             var name = ReflectionUtils.GetMemberName(selector);
-            return FieldIncreaseCx(name, increment);
+            return FieldIncreaseOrCreate(name, increment);
         }
 
         /// <summary>
         /// 使用指定的过期时间在当前对象所绑定的缓存上应用
-        /// <see cref="ICacheFieldIncreasable.FieldIncreaseCx{T, TField}(String, String, TField, TimeSpan)"/>方法。
+        /// <see cref="ICacheFieldIncreasable.FieldIncreaseOrCreate{T, TField}(String, String, TField, TimeSpan)"/>方法。
         /// 通过表达式选择类型成员。
         /// </summary>
-        public TField FieldIncreaseCx<TField>(
+        public TField FieldIncreaseOrCreate<TField>(
             Expression<Func<TValue, TField>> selector, TField increment, int expirationSeconds)
         {
             var name = ReflectionUtils.GetMemberName(selector);
-            return FieldIncreaseCx(name, increment, expirationSeconds);
+            return FieldIncreaseOrCreate(name, increment, expirationSeconds);
         }
 
         private ICacheIncreasable GetCacheIncreasableProvider()

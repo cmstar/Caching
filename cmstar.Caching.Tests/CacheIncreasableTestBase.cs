@@ -25,23 +25,23 @@ namespace cmstar.Caching
             CacheProvider.Increase<long>(Key, 100);
             NotExist(Key);
 
-            Console.WriteLine("Test expiration control for INCREASECX...");
-            CacheProvider.IncreaseCx<long>(Key, 1, ExpiryShort);
+            Console.WriteLine("Test expiration control for INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<long>(Key, 1, ExpiryShort);
             EnsureCacheValue(Key, 1);
             Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
             NotExist(Key);
 
-            Console.WriteLine("Test INCREASECX...");
-            CacheProvider.IncreaseCx<long>(Key, 1, ExpiryLong);
+            Console.WriteLine("Test INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<long>(Key, 1, ExpiryLong);
             EnsureCacheValue(Key, 1);
 
-            CacheProvider.IncreaseCx<long>(Key, -5, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<long>(Key, -5, ExpiryLong);
             EnsureCacheValue(Key, -4);
 
-            CacheProvider.IncreaseCx<long>(Key, 10004, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<long>(Key, 10004, ExpiryLong);
             EnsureCacheValue(Key, 10000);
 
-            CacheProvider.IncreaseCx<long>(Key, -10000, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<long>(Key, -10000, ExpiryLong);
             EnsureCacheValue(Key, 0);
 
             Console.WriteLine("Test INCREASE...");
@@ -79,23 +79,23 @@ namespace cmstar.Caching
             CacheProvider.Increase<int>(Key, 100);
             NotExist(Key);
 
-            Console.WriteLine("Test expiration control for INCREASECX...");
-            CacheProvider.IncreaseCx<int>(Key, 1, ExpiryShort);
+            Console.WriteLine("Test expiration control for INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<int>(Key, 1, ExpiryShort);
             EnsureCacheValue(Key, 1);
             Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
             NotExist(Key);
 
-            Console.WriteLine("Test INCREASECX...");
-            CacheProvider.IncreaseCx<int>(Key, 1, ExpiryLong);
+            Console.WriteLine("Test INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<int>(Key, 1, ExpiryLong);
             EnsureCacheValue(Key, 1);
 
-            CacheProvider.IncreaseCx<int>(Key, -5, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<int>(Key, -5, ExpiryLong);
             EnsureCacheValue(Key, -4);
 
-            CacheProvider.IncreaseCx<int>(Key, 10004, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<int>(Key, 10004, ExpiryLong);
             EnsureCacheValue(Key, 10000);
 
-            CacheProvider.IncreaseCx<int>(Key, -10000, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<int>(Key, -10000, ExpiryLong);
             EnsureCacheValue(Key, 0);
 
             Console.WriteLine("Test INCREASE...");
@@ -133,23 +133,23 @@ namespace cmstar.Caching
             CacheProvider.Increase<short>(Key, 100);
             NotExist(Key);
 
-            Console.WriteLine("Test expiration control for INCREASECX...");
-            CacheProvider.IncreaseCx<short>(Key, 1, ExpiryShort);
+            Console.WriteLine("Test expiration control for INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<short>(Key, 1, ExpiryShort);
             EnsureCacheValue(Key, 1);
             Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
             NotExist(Key);
 
-            Console.WriteLine("Test INCREASECX...");
-            CacheProvider.IncreaseCx<short>(Key, 1, ExpiryLong);
+            Console.WriteLine("Test INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<short>(Key, 1, ExpiryLong);
             EnsureCacheValue(Key, 1);
 
-            CacheProvider.IncreaseCx<short>(Key, -5, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<short>(Key, -5, ExpiryLong);
             EnsureCacheValue(Key, -4);
 
-            CacheProvider.IncreaseCx<short>(Key, 10004, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<short>(Key, 10004, ExpiryLong);
             EnsureCacheValue(Key, 10000);
 
-            CacheProvider.IncreaseCx<short>(Key, -10000, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<short>(Key, -10000, ExpiryLong);
             EnsureCacheValue(Key, 0);
 
             Console.WriteLine("Test INCREASE...");
@@ -187,17 +187,17 @@ namespace cmstar.Caching
             CacheProvider.Increase<byte>(Key, 100);
             NotExist(Key);
 
-            Console.WriteLine("Test expiration control for INCREASECX...");
-            CacheProvider.IncreaseCx<byte>(Key, 1, ExpiryShort);
+            Console.WriteLine("Test expiration control for INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<byte>(Key, 1, ExpiryShort);
             EnsureCacheValue(Key, 1);
             Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
             NotExist(Key);
 
-            Console.WriteLine("Test INCREASECX...");
-            CacheProvider.IncreaseCx<byte>(Key, 1, ExpiryLong);
+            Console.WriteLine("Test INCREASEORCREATE...");
+            CacheProvider.IncreaseOrCreate<byte>(Key, 1, ExpiryLong);
             EnsureCacheValue(Key, 1);
 
-            CacheProvider.IncreaseCx<byte>(Key, 3, ExpiryLong);
+            CacheProvider.IncreaseOrCreate<byte>(Key, 3, ExpiryLong);
             EnsureCacheValue(Key, 4);
 
             Console.WriteLine("Test INCREASE...");
