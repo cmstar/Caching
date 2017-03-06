@@ -14,12 +14,24 @@ namespace cmstar.Caching
 
         protected abstract ICacheIncreasable CacheProvider { get; }
 
-        [Test]
-        public void TestOnInt64()
+        [SetUp]
+        public void SetUp()
         {
             Console.WriteLine("Remove the old key...");
             CacheProvider.Remove(Key);
+        }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Console.WriteLine("Cleanup...");
+            CacheProvider.Remove(Key);
+            NotExist(Key);
+        }
+
+        [Test]
+        public void TestOnInt64()
+        {
             Console.WriteLine("Test INCREASE on not-existing key...");
             CacheProvider.Increase<long>(Key, 1);
             CacheProvider.Increase<long>(Key, 100);
@@ -62,18 +74,11 @@ namespace cmstar.Caching
 
             CacheProvider.Increase<long>(Key, 0);
             EnsureCacheValue(Key, -20980);
-
-            Console.WriteLine("Cleanup...");
-            CacheProvider.Remove(Key);
-            NotExist(Key);
         }
 
         [Test]
         public void TestOnInt32()
         {
-            Console.WriteLine("Remove the old key...");
-            CacheProvider.Remove(Key);
-
             Console.WriteLine("Test INCREASE on not-existing key...");
             CacheProvider.Increase<int>(Key, 1);
             CacheProvider.Increase<int>(Key, 100);
@@ -116,18 +121,11 @@ namespace cmstar.Caching
 
             CacheProvider.Increase<int>(Key, 0);
             EnsureCacheValue(Key, -20980);
-
-            Console.WriteLine("Cleanup...");
-            CacheProvider.Remove(Key);
-            NotExist(Key);
         }
 
         [Test]
         public void TestOnInt16()
         {
-            Console.WriteLine("Remove the old key...");
-            CacheProvider.Remove(Key);
-
             Console.WriteLine("Test INCREASE on not-existing key...");
             CacheProvider.Increase<short>(Key, 1);
             CacheProvider.Increase<short>(Key, 100);
@@ -170,18 +168,11 @@ namespace cmstar.Caching
 
             CacheProvider.Increase<short>(Key, 0);
             EnsureCacheValue(Key, 0);
-
-            Console.WriteLine("Cleanup...");
-            CacheProvider.Remove(Key);
-            NotExist(Key);
         }
 
         [Test]
         public void TestOnByte()
         {
-            Console.WriteLine("Remove the old key...");
-            CacheProvider.Remove(Key);
-
             Console.WriteLine("Test INCREASE on not-existing key...");
             CacheProvider.Increase<byte>(Key, 1);
             CacheProvider.Increase<byte>(Key, 100);
@@ -212,10 +203,6 @@ namespace cmstar.Caching
 
             CacheProvider.Increase<byte>(Key, 0);
             EnsureCacheValue(Key, 39);
-
-            Console.WriteLine("Cleanup...");
-            CacheProvider.Remove(Key);
-            NotExist(Key);
         }
 
         private void NotExist(string key)
