@@ -61,6 +61,15 @@ namespace cmstar.Caching
             _level2.Set(key, value, expiration);
         }
 
+        public bool Create<T>(string key, T value, TimeSpan expiration)
+        {
+            if (!_level2.Create(key, value, expiration))
+                return false;
+
+            SetLevel1(key, value);
+            return true;
+        }
+
         public bool Remove(string key)
         {
             var res = _level2.Remove(key);

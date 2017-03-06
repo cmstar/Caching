@@ -58,7 +58,7 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 设置一个缓存，并自动设置其超时。
+        /// 创建或更新具有指定键的缓存，该缓存带有默认的超时时间<seealso cref="BaseExpirationSeconds"/>。
         /// </summary>
         /// <param name="value">缓存的值。</param>
         public void Set(TValue value)
@@ -68,13 +68,35 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 设置一个缓存，并指定其超时时间。
+        /// 创建或更新具有指定键的缓存，并指定其超时时间。
         /// </summary>
         /// <param name="value">缓存的值。</param>
         /// <param name="expirationSeconds">超时时间，单位为秒。</param>
         public void Set(TValue value, int expirationSeconds)
         {
             _cacheManager.CacheProvider.Set(_key, value, TimeSpan.FromSeconds(expirationSeconds));
+        }
+
+        /// <summary>
+        /// 仅当缓存不存在时，创建缓存，该缓存带有默认的超时时间<seealso cref="BaseExpirationSeconds"/>。
+        /// </summary>
+        /// <param name="value">缓存的值。</param>
+        /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
+        public bool Create(TValue value)
+        {
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            return Create(value, expirationSeconds);
+        }
+
+        /// <summary>
+        /// 仅当缓存不存在时，创建缓存，并指定其超时时间。
+        /// </summary>
+        /// <param name="value">缓存的值。</param>
+        /// <param name="expirationSeconds">超时时间，单位为秒。</param>
+        /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
+        public bool Create(TValue value, int expirationSeconds)
+        {
+            return _cacheManager.CacheProvider.Create(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>

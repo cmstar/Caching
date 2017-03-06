@@ -27,7 +27,16 @@ namespace cmstar.Caching
         bool TryGet<T>(string key, out T value);
 
         /// <summary>
-        /// 设置一个缓存。
+        /// 仅当缓存不存在时，创建缓存。
+        /// </summary>
+        /// <param name="key">缓存的键。</param>
+        /// <param name="value">缓存的值。</param>
+        /// <param name="expiration">指定缓存在多长时间后过期。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。</param>
+        /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
+        bool Create<T>(string key, T value, TimeSpan expiration);
+
+        /// <summary>
+        /// 创建或更新具有指定键的缓存。
         /// </summary>
         /// <param name="key">缓存的键。</param>
         /// <param name="value">缓存的值。</param>

@@ -30,6 +30,18 @@ namespace cmstar.Caching
             HttpRuntime.Cache.Insert(key, value, null, e, Cache.NoSlidingExpiration);
         }
 
+        protected override bool DoCreate(string key, object value, TimeSpan expiration)
+        {
+            var e = TimeSpan.Zero.Equals(expiration)
+                ? DateTime.MaxValue
+                : DateTime.Now.Add(expiration);
+
+            var oldValue = HttpRuntime.Cache.Add(
+                key, value, null, e, Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+
+            return oldValue == null;
+        }
+
         protected override bool DoRemove(string key)
         {
             return HttpRuntime.Cache.Remove(key) != null;

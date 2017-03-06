@@ -55,6 +55,16 @@ namespace cmstar.Caching
             }
         }
 
+        public bool Create<T>(string key, T value, TimeSpan expiration)
+        {
+            ArgAssert.NotNullOrEmpty(key, "key");
+
+            using (_lock.Enter(key))
+            {
+                return InternalCreate(key, value, expiration);
+            }
+        }
+
         public bool Remove(string key)
         {
             ArgAssert.NotNullOrEmpty(key, "key");
@@ -138,10 +148,11 @@ namespace cmstar.Caching
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
                     tar = constructor();
                     setter(tar, value);
-                    InternalSet(key, tar, expiration);
-                    return true;
+                    return InternalCreate(key, tar, expiration);
                 }
 
+                // 缓存存在但为null，null不能进行字段赋值，如果此时生成新对象替换掉null，就不
+                // 仅仅是更新了字段，而是更新了整个缓存，与API定义预期不符，所以这里直接返回false
                 if (tar == null)
                     return false;
 
@@ -161,8 +172,15 @@ namespace cmstar.Caching
         protected abstract void DoSet(string key, object value, TimeSpan expiration);
 
         /// <summary>
+        /// 仅当缓存不存在时，创建缓存，并设置其过期时间。<paramref name="value"/>不会为null。
+        /// </summary>
+        /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
+        protected abstract bool DoCreate(string key, object value, TimeSpan expiration);
+
+        /// <summary>
         /// 从缓存中移除指定的键。
         /// </summary>
+        /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
         protected abstract bool DoRemove(string key);
 
         private bool InternalTryGet(string key, out object value)
@@ -177,6 +195,11 @@ namespace cmstar.Caching
 
             value = v;
             return true;
+        }
+
+        private bool InternalCreate(string key, object value, TimeSpan expiration)
+        {
+            return DoCreate(key, value ?? CacheEnv.NullValue, expiration);
         }
 
         private void InternalSet(string key, object value, TimeSpan expiration)

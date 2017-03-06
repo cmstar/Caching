@@ -47,10 +47,12 @@ namespace cmstar.Caching.Redis
 
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
-            var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
-            var db = _redis.GetDatabase(_databaseNumber);
-            var redisValue = RedisConvert.ToRedisValue(value);
-            db.StringSet(key, redisValue, e);
+            InternalSet(key, value, expiration, When.Always);
+        }
+
+        public bool Create<T>(string key, T value, TimeSpan expiration)
+        {
+            return InternalSet(key, value, expiration, When.NotExists);
         }
 
         public bool Remove(string key)
@@ -91,6 +93,14 @@ namespace cmstar.Caching.Redis
             }
 
             return (T)Convert.ChangeType(res, typeof(T));
+        }
+
+        private bool InternalSet<T>(string key, T value, TimeSpan expiration, When when)
+        {
+            var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
+            var db = _redis.GetDatabase(_databaseNumber);
+            var redisValue = RedisConvert.ToRedisValue(value);
+            return db.StringSet(key, redisValue, e, when);
         }
     }
 }

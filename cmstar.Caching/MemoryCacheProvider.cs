@@ -34,6 +34,15 @@ namespace cmstar.Caching
             _cache.Set(key, value, e);
         }
 
+        protected override bool DoCreate(string key, object value, TimeSpan expiration)
+        {
+            var e = TimeSpan.Zero.Equals(expiration)
+                ? ObjectCache.InfiniteAbsoluteExpiration
+                : DateTimeOffset.Now.Add(expiration);
+
+            return _cache.Add(key, value, e);
+        }
+
         protected override bool DoRemove(string key)
         {
             return _cache.Remove(key) != null;
