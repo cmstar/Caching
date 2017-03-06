@@ -33,5 +33,14 @@ namespace cmstar.Caching.Redis
                 get { return Cache; }
             }
         }
+
+        [TestFixture]
+        public class RedisHashCacheProviderFieldIncreasableTests : CacheFieldIncreasableTestBase
+        {
+            protected override ICacheFieldIncreasable CacheProvider
+            {
+                get { return Cache; }
+            }
+        }
     }
 }

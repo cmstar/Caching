@@ -6,7 +6,7 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 基于redis的hash实现的缓存提供器。
     /// </summary>
-    public class RedisHashCacheProvider : ICacheFieldAccessable, ICacheIncreasable
+    public class RedisHashCacheProvider : ICacheFieldIncreasable, ICacheIncreasable
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -132,6 +132,34 @@ namespace cmstar.Caching.Redis
             }
 
             return true;
+        }
+
+        public TField FieldIncrease<T, TField>(string key, string field, TField increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.HashExists(key, field));
+
+            var res = tran.HashIncrementAsync(key, field, incrementLong);
+            return tran.Execute()
+                ? (TField)Convert.ChangeType(res.Result, typeof(TField))
+                : default(TField);
+        }
+
+        public TField FieldIncreaseOrCreate<T, TField>(string key, string field, TField increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = db.HashIncrement(key, field, incrementLong);
+
+            // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
+            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return (TField)Convert.ChangeType(res, typeof(TField));
         }
 
         private bool CreateOrSet<T>(string key, T value, TimeSpan expiration, bool create)
