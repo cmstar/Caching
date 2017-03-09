@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adding.cs" />
     <Compile Include="ArgAssert.cs" />
     <Compile Include="CacheEnv.cs" />
     <Compile Include="CacheExpiration.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="CacheOperation.cs" />
     <Compile Include="CacheOperationBase.cs" />
     <Compile Include="CacheUtils.cs" />
+    <Compile Include="CacheValue.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />

@@ -24,5 +24,23 @@ namespace cmstar.Caching
                 get { return CacheInstance; }
             }
         }
+
+        [TestFixture]
+        public class MemoryCacheProviderIncreasableTests : CacheIncreasableTestBase
+        {
+            protected override ICacheIncreasable CacheProvider
+            {
+                get { return CacheInstance; }
+            }
+        }
+
+        [TestFixture]
+        public class MemoryCacheProviderFieldIncreasableTests : CacheFieldIncreasableTestBase
+        {
+            protected override ICacheFieldIncreasable CacheProvider
+            {
+                get { return CacheInstance; }
+            }
+        }
     }
 }

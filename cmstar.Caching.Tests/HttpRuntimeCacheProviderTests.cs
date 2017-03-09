@@ -21,5 +21,23 @@ namespace cmstar.Caching
                 get { return HttpRuntimeCacheProvider.Instance; }
             }
         }
+
+        [TestFixture]
+        public class HttpRuntimeCacheProviderIncreasableTests : CacheIncreasableTestBase
+        {
+            protected override ICacheIncreasable CacheProvider
+            {
+                get { return HttpRuntimeCacheProvider.Instance; }
+            }
+        }
+
+        [TestFixture]
+        public class HttpRuntimeCacheProviderFieldIncreasableTests : CacheFieldIncreasableTestBase
+        {
+            protected override ICacheFieldIncreasable CacheProvider
+            {
+                get { return HttpRuntimeCacheProvider.Instance; }
+            }
+        }
     }
 }
