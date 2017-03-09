@@ -1,6 +1,7 @@
 ﻿using System;
 using cmstar.Caching.Reflection;
 using cmstar.Caching.Reflection.Emit;
+using System.Collections.Concurrent;
 
 namespace cmstar.Caching
 {
@@ -12,6 +13,9 @@ namespace cmstar.Caching
     {
         private readonly SpinKeyLock<string> _lock = new SpinKeyLock<string>();
 
+        private static readonly ConcurrentDictionary<TypeMemberIndentity, Type> MemberTypes
+            = new ConcurrentDictionary<TypeMemberIndentity, Type>();
+
         public T Get<T>(string key)
         {
             ArgAssert.NotNullOrEmpty(key, "key");
@@ -22,10 +26,9 @@ namespace cmstar.Caching
                 if (v == null)
                     return default(T);
 
-                if (v is T)
-                    return (T)v;
-
-                return (T)Convert.ChangeType(v, typeof(T));
+                return v is T
+                    ? (T)v
+                    : (T)Convert.ChangeType(v, typeof(T));
             }
         }
 
@@ -42,7 +45,10 @@ namespace cmstar.Caching
                     return false;
                 }
 
-                value = v == null ? default(T) : (T)v;
+                value = v is T
+                    ? (T)v
+                    : (T)Convert.ChangeType(v, typeof(T));
+
                 return true;
             }
         }
@@ -87,9 +93,12 @@ namespace cmstar.Caching
                 if (!InternalTryGetRaw(key, out cacheValue))
                     return default(T);
 
-                var res = Adding.Add(cacheValue.Value, increment);
-                cacheValue.Value = res;
-                return (T)Convert.ChangeType(res, typeof(T));
+                var result = Adding.AddIntegers(cacheValue.Value, increment);
+                cacheValue.Value = result.Value;
+
+                return result.IsIncrementType
+                    ? (T)result.Value
+                    : (T)Convert.ChangeType(result, typeof(T));
             }
         }
 
@@ -106,9 +115,12 @@ namespace cmstar.Caching
                     return increment;
                 }
 
-                var res = Adding.Add(cacheValue.Value, increment);
-                cacheValue.Value = res;
-                return (T)Convert.ChangeType(res, typeof(T));
+                var result = Adding.AddIntegers(cacheValue.Value, increment);
+                cacheValue.Value = result.Value;
+
+                return result.IsIncrementType
+                    ? (T)result.Value
+                    : (T)Convert.ChangeType(result, typeof(T));
             }
         }
 
@@ -218,9 +230,16 @@ namespace cmstar.Caching
                     return default(TField);
 
                 var oldFieldValue = getter(tar);
-                var newFieldValue = Adding.Add(oldFieldValue, increment);
+                var result = Adding.AddIntegers(oldFieldValue, increment);
+
+                var newFieldValue = result.IsTargetType
+                    ? result.Value
+                    : Convert.ChangeType(result.Value, oldFieldValue.GetType());
                 setter(tar, newFieldValue);
-                return (TField)Convert.ChangeType(newFieldValue, typeof(TField));
+
+                return result.IsIncrementType
+                    ? (TField)result.Value
+                    : (TField)Convert.ChangeType(result, typeof(TField));
             }
         }
 
@@ -244,7 +263,17 @@ namespace cmstar.Caching
                 {
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
                     tar = constructor();
-                    setter(tar, increment);
+
+                    var fieldType = ResolveMemberType(typeof(T), field);
+                    if (typeof(TField) == fieldType)
+                    {
+                        setter(tar, increment);
+                    }
+                    else
+                    {
+                        setter(tar, Convert.ChangeType(increment, fieldType));
+                    }
+
                     InternalSet(key, tar, expiration);
                     return increment;
                 }
@@ -253,9 +282,16 @@ namespace cmstar.Caching
                     return default(TField);
 
                 var oldFieldValue = getter(tar);
-                var newFieldValue = Adding.Add(oldFieldValue, increment);
+                var result = Adding.AddIntegers(oldFieldValue, increment);
+
+                var newFieldValue = result.IsTargetType
+                    ? result.Value
+                    : Convert.ChangeType(result.Value, oldFieldValue.GetType());
                 setter(tar, newFieldValue);
-                return (TField)Convert.ChangeType(newFieldValue, typeof(TField));
+
+                return result.IsIncrementType
+                    ? (TField)result.Value
+                    : (TField)Convert.ChangeType(result, typeof(TField));
             }
         }
 
@@ -320,6 +356,24 @@ namespace cmstar.Caching
         {
             var cacheValue = value == null ? CacheEnv.NullValue : new CacheValue(value);
             DoSet(key, cacheValue, expiration);
+        }
+
+        private Type ResolveMemberType(Type type, string memberName)
+        {
+            var id = new TypeMemberIndentity(type, memberName);
+            return MemberTypes.GetOrAdd(id, x =>
+            {
+                var propInfo = type.GetProperty(memberName);
+                if (propInfo != null)
+                    return propInfo.PropertyType;
+
+                var fieldInfo = type.GetField(memberName);
+                if (fieldInfo != null)
+                    return fieldInfo.FieldType;
+
+                var msg = string.Format("The member '{0}' was not found on type '{1}'.", memberName, type);
+                throw new InvalidOperationException(msg);
+            });
         }
     }
 }

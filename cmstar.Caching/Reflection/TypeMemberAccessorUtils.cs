@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using cmstar.Caching.Reflection.Emit;
+using System.Collections.Concurrent;
 
 namespace cmstar.Caching.Reflection
 {
     /// <summary>
     /// 提供了获取类型成员访问方法相关的方法。
     /// </summary>
-    internal static class TypeMemberAccessorUtils
+    public static class TypeMemberAccessorUtils
     {
-        private static readonly ConcurrentDictionary<CacheObjectFieldIndentity, Func<object, object>> Getters
-            = new ConcurrentDictionary<CacheObjectFieldIndentity, Func<object, object>>();
+        private static readonly ConcurrentDictionary<TypeMemberIndentity, Func<object, object>> Getters
+            = new ConcurrentDictionary<TypeMemberIndentity, Func<object, object>>();
 
-        private static readonly ConcurrentDictionary<CacheObjectFieldIndentity, Action<object, object>> Setters
-            = new ConcurrentDictionary<CacheObjectFieldIndentity, Action<object, object>>();
+        private static readonly ConcurrentDictionary<TypeMemberIndentity, Action<object, object>> Setters
+            = new ConcurrentDictionary<TypeMemberIndentity, Action<object, object>>();
 
         /// <summary>
         /// 获取指定类型上指定名称的成员值的访问器。
@@ -27,7 +27,7 @@ namespace cmstar.Caching.Reflection
             ArgAssert.NotNull(type, "type");
             ArgAssert.NotNull(memberName, "memberName");
 
-            var id = new CacheObjectFieldIndentity(type, memberName);
+            var id = new TypeMemberIndentity(type, memberName);
             Func<object, object> res;
 
             if (Getters.TryGetValue(id, out res))
@@ -50,7 +50,7 @@ namespace cmstar.Caching.Reflection
             ArgAssert.NotNull(type, "type");
             ArgAssert.NotNull(memberName, "memberName");
 
-            var id = new CacheObjectFieldIndentity(type, memberName);
+            var id = new TypeMemberIndentity(type, memberName);
             Action<object, object> res;
 
             if (Setters.TryGetValue(id, out res))
@@ -85,37 +85,6 @@ namespace cmstar.Caching.Reflection
                 return FieldAccessorGenerator.CreateGetter(fieldInfo);
 
             return null;
-        }
-
-        private struct CacheObjectFieldIndentity : IEquatable<CacheObjectFieldIndentity>
-        {
-            private readonly Type _type;
-            private readonly string _memberName;
-
-            public CacheObjectFieldIndentity(Type type, string memberName)
-            {
-                _type = type;
-                _memberName = memberName;
-            }
-
-            public bool Equals(CacheObjectFieldIndentity other)
-            {
-                return other._type == _type && other._memberName == _memberName;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (!(obj is CacheObjectFieldIndentity))
-                    return false;
-
-                return Equals((CacheObjectFieldIndentity)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                var hash = _type.GetHashCode() ^ _memberName.GetHashCode();
-                return hash;
-            }
         }
     }
 }

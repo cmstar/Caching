@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adding.cs" />
+    <Compile Include="AddingResult.cs" />
     <Compile Include="ArgAssert.cs" />
     <Compile Include="CacheEnv.cs" />
     <Compile Include="CacheExpiration.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Reflection\Emit\PropertyAccessorGenerator.cs" />
     <Compile Include="Reflection\ReflectionUtils.cs" />
     <Compile Include="Reflection\TypeMemberAccessorUtils.cs" />
+    <Compile Include="Reflection\TypeMemberIndentity.cs" />
     <Compile Include="SpinKeyLock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

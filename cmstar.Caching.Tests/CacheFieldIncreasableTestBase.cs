@@ -175,36 +175,36 @@ namespace cmstar.Caching
         }
 
         [Test]
-        public void TestOnDecimalForStruct()
+        public void TestOnInt32ForStruct()
         {
             Console.WriteLine("Test FIELDINCREASE on non-existing key...");
-            Assert.AreEqual(0, CacheProvider.FieldIncrease<CacheValueStruct, decimal>(Key, "D", 1));
+            Assert.AreEqual(0, CacheProvider.FieldIncrease<CacheValueStruct, int>(Key, "N", 1));
             AssertCacheNotExist();
 
             Console.WriteLine("Test FIELDINCREASE on non-existing field...");
             CacheProvider.Create(Key, new CacheValueClass(), ExpiryLong);
-            Assert.AreEqual(0, CacheProvider.FieldIncrease<CacheValueStruct, decimal>(Key, "nx", 1));
+            Assert.AreEqual(0, CacheProvider.FieldIncrease<CacheValueStruct, int>(Key, "nx", 1));
             Cleanup();
 
             Console.WriteLine("Test expiration control for FIELDINCREASEORCREATE...");
-            Assert.AreEqual(1, CacheProvider.FieldIncreaseOrCreate<CacheValueStruct, decimal>(Key, "D", 1, ExpiryShort));
-            AssertCacheValue<CacheValueStruct>(x => Assert.AreEqual(1, x.D));
+            Assert.AreEqual(1, CacheProvider.FieldIncreaseOrCreate<CacheValueStruct, int>(Key, "N", 1, ExpiryShort));
+            AssertCacheValue<CacheValueStruct>(x => Assert.AreEqual(1, x.N));
             Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
             AssertCacheNotExist();
 
-            Func<CacheValueStruct, decimal> fieldSelector = x => x.D;
+            Func<CacheValueStruct, int> fieldSelector = x => x.N;
 
             Console.WriteLine("Test FIELDINCREASEORCREATE...");
-            Func<decimal, decimal> increaseOrCreate =
-                x => CacheProvider.FieldIncreaseOrCreate<CacheValueStruct, decimal>(Key, "D", x, ExpiryLong);
+            Func<int, int> increaseOrCreate =
+                x => CacheProvider.FieldIncreaseOrCreate<CacheValueStruct, int>(Key, "N", x, ExpiryLong);
             ActionAndAssert(increaseOrCreate, fieldSelector, 1, 1);
             ActionAndAssert(increaseOrCreate, fieldSelector, -5, -4);
             ActionAndAssert(increaseOrCreate, fieldSelector, 10004, 10000);
             ActionAndAssert(increaseOrCreate, fieldSelector, -10000, 0);
 
             Console.WriteLine("Test FIELDINCREASE...");
-            Func<decimal, decimal> increase =
-                x => CacheProvider.FieldIncrease<CacheValueStruct, decimal>(Key, "D", x);
+            Func<int, int> increase =
+                x => CacheProvider.FieldIncrease<CacheValueStruct, int>(Key, "N", x);
             ActionAndAssert(increase, fieldSelector, 1, 1);
             ActionAndAssert(increase, fieldSelector, 1, 2);
             ActionAndAssert(increase, fieldSelector, 12356, 12358);
