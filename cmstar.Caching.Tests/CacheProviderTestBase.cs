@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using NUnit.Framework;
 
 namespace cmstar.Caching
@@ -6,7 +7,32 @@ namespace cmstar.Caching
     [TestFixture]
     public abstract class CacheProviderTestBase
     {
+        private const string Key = "TEST_12740E08F86E42A4A8B0638E653DCF3A";
+        private static readonly TimeSpan ExpiryShort = TimeSpan.FromMilliseconds(200);
+        private static readonly TimeSpan ExpiryLong = TimeSpan.FromMinutes(2);
+
         protected abstract ICacheProvider CacheProvider { get; }
+
+        [Test]
+        public void TestExpirationControl()
+        {
+            CacheProvider.Set(Key, string.Empty, ExpiryShort);
+            Thread.Sleep(ExpiryShort.Add(TimeSpan.FromMilliseconds(50)));
+            Assert.IsNull(CacheProvider.Get<string>(Key));
+            Assert.IsFalse(CacheProvider.Remove(Key));
+        }
+
+        [Test]
+        public void TestImplicicConvert()
+        {
+            CacheProvider.Set(Key, 2.0D, ExpiryLong);
+            Assert.AreEqual(2.0D, CacheProvider.Get<double>(Key));
+            Assert.AreEqual(2.0F, CacheProvider.Get<float>(Key));
+            Assert.AreEqual(2, CacheProvider.Get<short>(Key));
+            Assert.AreEqual(2, CacheProvider.Get<int>(Key));
+            Assert.AreEqual(2L, CacheProvider.Get<long>(Key));
+            Assert.AreEqual(2, CacheProvider.Get<byte>(Key));
+        }
 
         [Test]
         public void TestOnBool()
@@ -218,42 +244,39 @@ namespace cmstar.Caching
                 : string.Format("Perform test on type {0} value '{1}' ...", type, valueForTest);
             Console.WriteLine(msg);
 
-            var cacheKey = "TEST_12740E08F86E42A4A8B0638E653DCF3A";
-            var expiry = TimeSpan.FromMinutes(5);
-
             Console.WriteLine("Remove the old key...");
-            CacheProvider.Remove(cacheKey);
+            CacheProvider.Remove(Key);
 
             Console.WriteLine("Test GET on non-existing key...");
             var nullValue = default(T);
-            var value = CacheProvider.Get<T>(cacheKey);
+            var value = CacheProvider.Get<T>(Key);
             Assert.AreEqual(nullValue, value);
 
             Console.WriteLine("Test TRYGET on non-existing key...");
-            Assert.IsFalse(CacheProvider.TryGet(cacheKey, out value));
+            Assert.IsFalse(CacheProvider.TryGet(Key, out value));
 
             Console.WriteLine("Test SET on non-existing key...");
-            CacheProvider.Set(cacheKey, valueForTest, expiry);
+            CacheProvider.Set(Key, valueForTest, ExpiryLong);
 
             Console.WriteLine("Test GET on existing key...");
-            value = CacheProvider.Get<T>(cacheKey);
+            value = CacheProvider.Get<T>(Key);
             Assert.AreEqual(valueForTest, value);
 
             Console.WriteLine("Test TRYGET on existing key...");
-            Assert.IsTrue(CacheProvider.TryGet(cacheKey, out value));
+            Assert.IsTrue(CacheProvider.TryGet(Key, out value));
             Assert.AreEqual(valueForTest, value);
 
             Console.WriteLine("Test REMOVE...");
-            Assert.IsTrue(CacheProvider.Remove(cacheKey));
-            Assert.IsFalse(CacheProvider.Remove(cacheKey));
+            Assert.IsTrue(CacheProvider.Remove(Key));
+            Assert.IsFalse(CacheProvider.Remove(Key));
 
             Console.WriteLine("Test SET on existing key...");
-            CacheProvider.Set(cacheKey, Guid.NewGuid(), expiry);
-            CacheProvider.Set(cacheKey, valueForTest, expiry); // replace the old key
+            CacheProvider.Set(Key, Guid.NewGuid(), ExpiryLong);
+            CacheProvider.Set(Key, valueForTest, ExpiryLong); // replace the old key
 
-            value = CacheProvider.Get<T>(cacheKey);
+            value = CacheProvider.Get<T>(Key);
             Assert.AreEqual(valueForTest, value);
-            Assert.IsTrue(CacheProvider.TryGet(cacheKey, out value));
+            Assert.IsTrue(CacheProvider.TryGet(Key, out value));
             Assert.AreEqual(valueForTest, value);
         }
 

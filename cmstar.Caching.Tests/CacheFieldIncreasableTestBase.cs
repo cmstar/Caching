@@ -215,12 +215,20 @@ namespace cmstar.Caching
 
         private void AssertCacheNotExist()
         {
+            // 在一些缓存实现中（比如.net的MemoryCache和HttpRuntimeCache），缓存有两种过期方式，
+            // 1 周期性的移除，周期可能比较久，在较短时间内未必会被清理；
+            // 2 在访问缓存对象时，检查该对象是否过期，若过期，则立刻清理之。
+            // 所以直接调用Remove方法，可能缓存清理周期还没到，虽然缓存过期了，但因为此时缓存对象
+            // 还在，仍会返回true（清理成功）。我们先Get一下，确保该清的已经被清了（情况2），再调
+            // 用Remove，此时才可以保证其返回false。
+            Assert.IsNull(CacheProvider.Get<object>(Key));
             Assert.IsFalse(CacheProvider.Remove(Key));
         }
 
         private void AssertCacheValue<T>(Action<T> assert)
         {
             var cachedValue = CacheProvider.Get<T>(Key);
+            Assert.NotNull(cachedValue);
             assert(cachedValue);
         }
 
