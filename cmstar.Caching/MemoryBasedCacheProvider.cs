@@ -175,7 +175,12 @@ namespace cmstar.Caching
                 if (!InternalTryGet(key, out tar) || tar == null)
                     return false;
 
-                setter(tar, value);
+                var fieldType = ResolveMemberType(typeof(T), field);
+                var newFieldValue = typeof(TField) == fieldType
+                    ? value
+                    : Convert.ChangeType(value, fieldType);
+                setter(tar, newFieldValue);
+
                 return true;
             }
         }
@@ -192,21 +197,27 @@ namespace cmstar.Caching
             using (_lock.Enter(key))
             {
                 object tar;
-                if (!InternalTryGet(key, out tar))
+                var exists = InternalTryGet(key, out tar);
+
+                if (!exists)
                 {
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
                     tar = constructor();
-                    setter(tar, value);
-                    return InternalCreate(key, tar, expiration);
+                }
+                else if (tar == null)
+                {
+                    // 缓存存在但为null，null不能进行字段赋值，如果此时生成新对象替换掉null，就不
+                    // 仅仅是更新了字段，而是更新了整个缓存，与API定义预期不符，所以这里直接返回false
+                    return false;
                 }
 
-                // 缓存存在但为null，null不能进行字段赋值，如果此时生成新对象替换掉null，就不
-                // 仅仅是更新了字段，而是更新了整个缓存，与API定义预期不符，所以这里直接返回false
-                if (tar == null)
-                    return false;
+                var fieldType = ResolveMemberType(typeof(T), field);
+                var newFieldValue = typeof(TField) == fieldType
+                    ? value
+                    : Convert.ChangeType(value, fieldType);
+                setter(tar, newFieldValue);
 
-                setter(tar, value);
-                return true;
+                return exists || InternalCreate(key, tar, expiration);
             }
         }
 
@@ -258,21 +269,17 @@ namespace cmstar.Caching
 
             using (_lock.Enter(key))
             {
-                object tar;
+                object tar, newFieldValue;
                 if (!InternalTryGet(key, out tar))
                 {
                     var constructor = ConstructorInvokerGenerator.CreateDelegate(typeof(T));
                     tar = constructor();
 
                     var fieldType = ResolveMemberType(typeof(T), field);
-                    if (typeof(TField) == fieldType)
-                    {
-                        setter(tar, increment);
-                    }
-                    else
-                    {
-                        setter(tar, Convert.ChangeType(increment, fieldType));
-                    }
+                    newFieldValue = typeof(TField) == fieldType
+                        ? increment
+                        : Convert.ChangeType(increment, fieldType);
+                    setter(tar, newFieldValue);
 
                     InternalSet(key, tar, expiration);
                     return increment;
@@ -284,7 +291,7 @@ namespace cmstar.Caching
                 var oldFieldValue = getter(tar);
                 var result = Adding.AddIntegers(oldFieldValue, increment);
 
-                var newFieldValue = result.IsTargetType
+                newFieldValue = result.IsTargetType
                     ? result.Value
                     : Convert.ChangeType(result.Value, oldFieldValue.GetType());
                 setter(tar, newFieldValue);
@@ -377,4 +384,3 @@ namespace cmstar.Caching
         }
     }
 }
-
