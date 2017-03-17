@@ -35,6 +35,17 @@ namespace cmstar.Caching
         }
 
         /// <summary>
+        /// 以小时为单位，创建一个新的<see cref="CacheExpiration"/>实例。
+        /// </summary>
+        /// <param name="baseExpirationHours">缓存的基本过期时间（小时）。</param>
+        /// <param name="randomRangeHours">过期时间的随机量（小时），使用0表示不添加随机量。</param>
+        /// <returns><see cref="CacheExpiration"/>实例。</returns>
+        public static CacheExpiration FromHours(int baseExpirationHours, int randomRangeHours = 0)
+        {
+            return new CacheExpiration(baseExpirationHours * 3600, randomRangeHours * 3600);
+        }
+
+        /// <summary>
         /// 以<see cref="TimeSpan"/>为参照值，创建一个新的<see cref="CacheExpiration"/>实例。
         /// 时间精确到秒。
         /// </summary>
