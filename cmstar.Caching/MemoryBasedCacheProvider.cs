@@ -9,7 +9,7 @@ namespace cmstar.Caching
     /// 提供基于当前程序域使用的内存的缓存的基本读写操作，并基于这些操作进行的扩展及提供线程安全控制。
     /// 这是一个抽象类。
     /// </summary>
-    public abstract class MemoryBasedCacheProvider : ICacheFieldIncreasable, ICacheIncreasable
+    public abstract partial class MemoryBasedCacheProvider : ICacheFieldIncreasable, ICacheIncreasable
     {
         private readonly SpinKeyLock<string> _lock = new SpinKeyLock<string>();
 

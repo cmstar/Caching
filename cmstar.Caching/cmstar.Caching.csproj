@@ -52,12 +52,17 @@
     <Compile Include="CacheValue.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
+    <Compile Include="ICacheFieldAccessableAsync.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />
+    <Compile Include="ICacheFieldIncreasableAsync.cs" />
     <Compile Include="ICacheIncreasable.cs" />
+    <Compile Include="ICacheIncreasableAsync.cs" />
     <Compile Include="ICacheProvider.cs" />
+    <Compile Include="ICacheProviderAsync.cs" />
     <Compile Include="KeyOperation.cs" />
     <Compile Include="L2CacheProvider.cs" />
     <Compile Include="MemoryBasedCacheProvider.cs" />
+    <Compile Include="MemoryBasedCacheProvider_Async.cs" />
     <Compile Include="MemoryCacheProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\Emit\ConstructorInvokerGenerator.cs" />
@@ -71,6 +76,7 @@
     <Compile Include="Reflection\TypeMemberAccessorUtils.cs" />
     <Compile Include="Reflection\TypeMemberIndentity.cs" />
     <Compile Include="SpinKeyLock.cs" />
+    <Compile Include="TryGetResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
