@@ -22,6 +22,7 @@ namespace cmstar.Caching.Redis
             _databaseNumber = databaseNumber;
         }
 
+        /// <inheritdoc cref="ICacheProvider.Get{T}" />
         public T Get<T>(string key)
         {
             T value;
@@ -29,12 +30,13 @@ namespace cmstar.Caching.Redis
             return value;
         }
 
+        /// <inheritdoc cref="ICacheProvider.TryGet{T}" />
         public bool TryGet<T>(string key, out T value)
         {
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = db.StringGet(key);
 
-            if (!redisValue.HasValue)
+            if (redisValue.IsNull)
             {
                 value = default(T);
                 return false;
@@ -45,22 +47,26 @@ namespace cmstar.Caching.Redis
             return true;
         }
 
+        /// <inheritdoc cref="ICacheProvider.Set{T}" />
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
             InternalSet(key, value, expiration, When.Always);
         }
 
+        /// <inheritdoc cref="ICacheProvider.Create{T}" />
         public bool Create<T>(string key, T value, TimeSpan expiration)
         {
             return InternalSet(key, value, expiration, When.NotExists);
         }
 
+        /// <inheritdoc cref="ICacheProvider.Remove" />
         public bool Remove(string key)
         {
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDelete(key);
         }
 
+        /// <inheritdoc cref="ICacheIncreasable.Increase{T}" />
         public T Increase<T>(string key, T increment)
         {
             var incrementLong = Convert.ToInt64(increment);
@@ -75,6 +81,7 @@ namespace cmstar.Caching.Redis
                 : default(T);
         }
 
+        /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreate{T}" />
         public T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);

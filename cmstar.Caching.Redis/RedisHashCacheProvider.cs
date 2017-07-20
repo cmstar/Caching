@@ -22,6 +22,7 @@ namespace cmstar.Caching.Redis
             _databaseNumber = databaseNumber;
         }
 
+        /// <inheritdoc cref="ICacheProvider.Get{T}" />
         public T Get<T>(string key)
         {
             T value;
@@ -29,6 +30,7 @@ namespace cmstar.Caching.Redis
             return value;
         }
 
+        /// <inheritdoc cref="ICacheProvider.TryGet{T}" />
         public bool TryGet<T>(string key, out T value)
         {
             var db = _redis.GetDatabase(_databaseNumber);
@@ -43,22 +45,26 @@ namespace cmstar.Caching.Redis
             return true;
         }
 
+        /// <inheritdoc cref="ICacheProvider.Set{T}" />
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
             CreateOrSet(key, value, expiration, false);
         }
 
+        /// <inheritdoc cref="ICacheProvider.Create{T}" />
         public bool Create<T>(string key, T value, TimeSpan expiration)
         {
             return CreateOrSet(key, value, expiration, true);
         }
 
+        /// <inheritdoc cref="ICacheProvider.Remove" />
         public bool Remove(string key)
         {
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDelete(key);
         }
 
+        /// <inheritdoc cref="ICacheIncreasable.Increase{T}" />
         public T Increase<T>(string key, T increment)
         {
             var incrementLong = Convert.ToInt64(increment);
@@ -71,6 +77,7 @@ namespace cmstar.Caching.Redis
                 : default(T);
         }
 
+        /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreate{T}" />
         public T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);
@@ -86,6 +93,7 @@ namespace cmstar.Caching.Redis
             return (T)Convert.ChangeType(res, typeof(T));
         }
 
+        /// <inheritdoc cref="ICacheFieldAccessable.FieldGet{T,TField}" />
         public TField FieldGet<T, TField>(string key, string field)
         {
             TField value;
@@ -93,22 +101,23 @@ namespace cmstar.Caching.Redis
             return value;
         }
 
+        /// <inheritdoc cref="ICacheFieldAccessable.FieldTryGet{T,TField}" />
         public bool FieldTryGet<T, TField>(string key, string field, out TField value)
         {
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = db.HashGet(key, field);
 
-            if (!redisValue.HasValue)
+            if (redisValue.IsNull)
             {
                 value = default(TField);
                 return false;
             }
 
-            var v = RedisConvert.FromRedisValue<TField>(redisValue);
-            value = v == null ? default(TField) : (TField)v;
+            value = RedisConvert.FromRedisValue<TField>(redisValue);
             return true;
         }
 
+        /// <inheritdoc cref="ICacheFieldAccessable.FieldSet{T,TField}" />
         public bool FieldSet<T, TField>(string key, string field, TField value)
         {
             var redisValue = RedisConvert.ToRedisValue(value);
@@ -121,6 +130,7 @@ namespace cmstar.Caching.Redis
             return res;
         }
 
+        /// <inheritdoc cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}" />
         public bool FieldSetOrCreate<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
             var redisValue = RedisConvert.ToRedisValue(value);
@@ -134,6 +144,7 @@ namespace cmstar.Caching.Redis
             return true;
         }
 
+        /// <inheritdoc cref="ICacheFieldIncreasable.FieldIncrease{T,TField}" />
         public TField FieldIncrease<T, TField>(string key, string field, TField increment)
         {
             var incrementLong = Convert.ToInt64(increment);
@@ -147,6 +158,7 @@ namespace cmstar.Caching.Redis
                 : default(TField);
         }
 
+        /// <inheritdoc cref="ICacheFieldIncreasable.FieldIncreaseOrCreate{T,TField}" />
         public TField FieldIncreaseOrCreate<T, TField>(string key, string field, TField increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);
