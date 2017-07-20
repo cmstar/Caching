@@ -5,12 +5,15 @@
     /// </summary>
     public enum RedisDataType
     {
-        // 使用复杂序列化，使用JSON表示的类型
+        /// <summary>
+        /// 非简单对象，使用复杂序列化，使用JSON表示的类型。
+        /// </summary>
         Object,
 
         // 使用简单的序列化，能够用字符串表示的类型
         Guid,
         DateTime,
+
         DateTimeOffset,
         DBNull,
         Decimal,
@@ -29,5 +32,10 @@
         UInt64,
         Single,
         Double,
+
+        /// <summary>
+        /// 二进制数据。
+        /// </summary>
+        Binary
     }
 }

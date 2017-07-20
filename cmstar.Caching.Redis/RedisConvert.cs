@@ -161,9 +161,10 @@ namespace cmstar.Caching.Redis
         /// <typeparam name="T">转换后的目标类型。</typeparam>
         /// <param name="redisValue">待转换的<see cref="RedisValue"/>。</param>
         /// <returns>转换后的值，类型为<typeparamref name="T"/>。</returns>
-        public static object FromRedisValue<T>(RedisValue redisValue)
+        public static T FromRedisValue<T>(RedisValue redisValue)
         {
-            return FromRedisValue(redisValue, typeof(T));
+            var v = FromRedisValue(redisValue, typeof(T));
+            return (T)v;
         }
 
         /// <summary>
@@ -188,7 +189,7 @@ namespace cmstar.Caching.Redis
                     return (char)redisValue;
 
                 case TypeCode.SByte:
-                    return (SByte)redisValue;
+                    return (sbyte)redisValue;
 
                 case TypeCode.Byte:
                     return (byte)redisValue;
@@ -233,10 +234,14 @@ namespace cmstar.Caching.Redis
             if (type == typeof(Guid))
                 return new Guid((string)redisValue);
 
-            var stringValue = redisValue;
+            if (type == typeof(byte[]))
+                return ConvertToBinary(redisValue);
+
+            var stringValue = (string)redisValue;
             if (CacheEnv.NullValueString.Equals(stringValue))
                 return ReflectionUtils.GetDefaultValue(type);
 
+            // objects
             return JsonSerializer.Default.Deserialize(stringValue, type);
         }
 
@@ -269,7 +274,7 @@ namespace cmstar.Caching.Redis
                     return (char)value;
 
                 case TypeCode.SByte:
-                    return (SByte)value;
+                    return (sbyte)value;
 
                 case TypeCode.Byte:
                     return (byte)value;
@@ -304,14 +309,20 @@ namespace cmstar.Caching.Redis
                     return ((DateTime)value).Ticks;
 
                 case TypeCode.DBNull:
-                    return String.Empty;
+                    return string.Empty;
             }
 
             if (type == typeof(DateTimeOffset))
                 return DateTimeOffsetToString((DateTimeOffset)value);
 
+            // GUID是可以以二进制存储的，只需要16个字节。
+            // 但考虑到数据易读性和各个使用场景下的兼容性，这里采用了字符串存储的方案。
             if (type == typeof(Guid))
                 return ((Guid)value).ToString("N");
+
+            // 二进制数据以原生形式存储。
+            if (type == typeof(byte[]))
+                return (byte[])value;
 
             return JsonSerializer.Default.FastSerialize(value);
         }
@@ -381,6 +392,9 @@ namespace cmstar.Caching.Redis
             if (type == typeof(Guid))
                 return RedisDataType.Guid;
 
+            if (type == typeof(byte[]))
+                return RedisDataType.Binary;
+
             return RedisDataType.Object;
         }
 
@@ -393,6 +407,36 @@ namespace cmstar.Caching.Redis
         {
             var dataType = GetDataType(type);
             return dataType != RedisDataType.Object;
+        }
+
+        private static byte[] ConvertToBinary(RedisValue value)
+        {
+            if (!value.HasValue)
+                return new byte[0];
+
+            var bin = (byte[])value;
+            return IsBinaryNullValue(bin) ? null : bin;
+        }
+
+        // 比较redis上的值是否表示CLR null。
+        // redis不能直接存储null，null是使用一个特殊的值（CacheEnv.NullValueString）替代的，
+        // 此方法逐字节比较给定数据是否刚好是这个表示null的值。
+        private static bool IsBinaryNullValue(byte[] value)
+        {
+            if (value == null)
+                return true;
+
+            var len = value.Length;
+            if (len != CacheEnv.NullValueString.Length)
+                return false;
+
+            for (int i = 0; i < len; i++)
+            {
+                if (value[i] != CacheEnv.NullValueString[i])
+                    return false;
+            }
+
+            return true;
         }
 
         private static string DateTimeOffsetToString(DateTimeOffset d)
@@ -412,7 +456,7 @@ namespace cmstar.Caching.Redis
             return new DateTimeOffset(long.Parse(ticks), TimeSpan.FromTicks(long.Parse(offset)));
         }
 
-        private class TypeMemberCache
+        private static class TypeMemberCache
         {
             private static readonly ConcurrentDictionary<Type, Dictionary<string, TypeMember>> Cache
                 = new ConcurrentDictionary<Type, Dictionary<string, TypeMember>>();

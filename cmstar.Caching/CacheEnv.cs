@@ -15,7 +15,7 @@
         internal static readonly object NullValue = new object();
 
         /// <summary>
-        /// 用于表示<c>null</c>在缓存中作为字符串存储时的替代。
+        /// 用于表示<c>null</c>在缓存中作为字符串存储时的替代。仅包含ASCII字符。
         /// </summary>
         public const string NullValueString = "NIL*Zrx40vMTx23vnGxnA";
 

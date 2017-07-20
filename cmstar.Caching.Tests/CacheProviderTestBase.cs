@@ -7,9 +7,22 @@ namespace cmstar.Caching
     [TestFixture]
     public abstract class CacheProviderTestBase
     {
-        private const string Key = "TEST_12740E08F86E42A4A8B0638E653DCF3A";
-        private static readonly TimeSpan ExpiryShort = TimeSpan.FromMilliseconds(200);
-        private static readonly TimeSpan ExpiryLong = TimeSpan.FromMinutes(2);
+        /// <summary>
+        /// 当前测试用例中，缓存总是使用这个key存储。
+        /// </summary>
+        protected const string Key = "TEST_12740E08F86E42A4A8B0638E653DCF3A";
+
+        /// <summary>
+        /// 当前测试用例中使用的缓存超时。
+        /// 耗时较短的版本，主要用于验证超时。
+        /// </summary>
+        protected static readonly TimeSpan ExpiryShort = TimeSpan.FromMilliseconds(200);
+
+        /// <summary>
+        /// 当前测试用例中使用的缓存超时。
+        /// 用于测试缓存值，避免因网络延迟等原因，还没来得及获取到值就过期了。
+        /// </summary>
+        protected static readonly TimeSpan ExpiryLong = TimeSpan.FromMinutes(2);
 
         protected abstract ICacheProvider CacheProvider { get; }
 
@@ -58,6 +71,9 @@ namespace cmstar.Caching
         [Test]
         public void TestOnString()
         {
+            Console.WriteLine("Test empty string...");
+            PerformTestCacheProvider(string.Empty);
+
             Console.WriteLine("Test ASCII...");
             PerformTestCacheProvider("this is a string");
 
@@ -207,6 +223,15 @@ namespace cmstar.Caching
         }
 
         [Test]
+        public void TestOnBinary()
+        {
+            PerformTestCacheProvider(new byte[0]);
+            PerformTestCacheProvider(new byte[5]);
+            PerformTestCacheProvider(new byte[] { 1, 3, 5, 6, 9 });
+            PerformTestCacheProvider(new byte[] { 255 });
+        }
+
+        [Test]
         public void TestOnNull()
         {
             PerformTestCacheProvider((CacheValueClass)null);
@@ -236,12 +261,12 @@ namespace cmstar.Caching
             PerformTestCacheProvider(new NoMemberClass());
         }
 
-        private void PerformTestCacheProvider<T>(T valueForTest) where T : IEquatable<T>
+        private void PerformTestCacheProvider<T>(T valueForTest)
         {
             var type = typeof(T);
             var msg = Type.GetTypeCode(type) == TypeCode.Object
-                ? string.Format("Perform test on complex type {0} ...", type)
-                : string.Format("Perform test on type {0} value '{1}' ...", type, valueForTest);
+                ? $"Perform test on complex type {type} ..."
+                : $"Perform test on type {type} value '{valueForTest}' ...";
             Console.WriteLine(msg);
 
             Console.WriteLine("Remove the old key...");
@@ -250,7 +275,7 @@ namespace cmstar.Caching
             Console.WriteLine("Test GET on non-existing key...");
             var nullValue = default(T);
             var value = CacheProvider.Get<T>(Key);
-            Assert.AreEqual(nullValue, value);
+            AreEqual(nullValue, value);
 
             Console.WriteLine("Test TRYGET on non-existing key...");
             Assert.IsFalse(CacheProvider.TryGet(Key, out value));
@@ -260,11 +285,11 @@ namespace cmstar.Caching
 
             Console.WriteLine("Test GET on existing key...");
             value = CacheProvider.Get<T>(Key);
-            Assert.AreEqual(valueForTest, value);
+            AreEqual(valueForTest, value);
 
             Console.WriteLine("Test TRYGET on existing key...");
             Assert.IsTrue(CacheProvider.TryGet(Key, out value));
-            Assert.AreEqual(valueForTest, value);
+            AreEqual(valueForTest, value);
 
             Console.WriteLine("Test REMOVE...");
             Assert.IsTrue(CacheProvider.Remove(Key));
@@ -275,9 +300,30 @@ namespace cmstar.Caching
             CacheProvider.Set(Key, valueForTest, ExpiryLong); // replace the old key
 
             value = CacheProvider.Get<T>(Key);
-            Assert.AreEqual(valueForTest, value);
+            AreEqual(valueForTest, value);
             Assert.IsTrue(CacheProvider.TryGet(Key, out value));
-            Assert.AreEqual(valueForTest, value);
+            AreEqual(valueForTest, value);
+        }
+
+        private static void AreEqual(object expected, object actual)
+        {
+            if (expected == null || actual == null || expected.GetType() != typeof(byte[]))
+            {
+                Assert.AreEqual(expected, actual);
+                return;
+            }
+
+            // 数组不能直接比较，单独处理，逐项比对元素。
+            var expectedArray = (byte[])expected;
+            var actualArray = (byte[])actual;
+            var len = expectedArray.Length;
+            if (len != actualArray.Length)
+                Assert.Fail($"Expected length {len}, but was {actualArray.Length}");
+
+            for (int i = 0; i < len; i++)
+            {
+                Assert.AreEqual(expectedArray[i], actualArray[i], $"diff at idx {i}");
+            }
         }
 
         private class NoMemberClass : IEquatable<NoMemberClass>
