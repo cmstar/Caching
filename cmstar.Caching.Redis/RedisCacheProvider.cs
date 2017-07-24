@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Redis;
 
 namespace cmstar.Caching.Redis
@@ -6,7 +7,7 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 使用Redis作为缓存的缓存提供器。
     /// </summary>
-    public class RedisCacheProvider : ICacheIncreasable
+    public class RedisCacheProvider : ICacheIncreasable, ICacheIncreasableAsync
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -42,8 +43,7 @@ namespace cmstar.Caching.Redis
                 return false;
             }
 
-            var v = RedisConvert.FromRedisValue<T>(redisValue);
-            value = v == null ? default(T) : (T)v;
+            value = RedisConvert.FromRedisValue<T>(redisValue);
             return true;
         }
 
@@ -88,15 +88,87 @@ namespace cmstar.Caching.Redis
             var db = _redis.GetDatabase(_databaseNumber);
             var res = db.StringIncrement(key, incrementLong);
 
-            /*
-             * redis的INCR*命令本身没有提供仅在新建值的时候设置过期时间的机制，
-             * 这里分两步处理，先INCR*；然后判定如果是新建的值，就设置过期时间。
-             * 然而INCR*仅返回当前的值，不说明值是新建的还是更新的，我们等通过
-             * 返回的值是否与增量一致来判断是否是新建的。
-             */
-            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            // 如果值是新建的，需要设置其超时时间。
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
             {
                 db.KeyExpire(key, expiration);
+            }
+
+            return (T)Convert.ChangeType(res, typeof(T));
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.GetAsync{T}" />
+        public async Task<T> GetAsync<T>(string key)
+        {
+            var res = await TryGetAsync<T>(key);
+            return res.Value;
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.TryGetAsync{T}" />
+        public async Task<TryGetResult<T>> TryGetAsync<T>(string key)
+        {
+            var db = _redis.GetDatabase(_databaseNumber);
+            var redisValue = await db.StringGetAsync(key);
+
+            var hasValue = !redisValue.IsNull;
+            var value = hasValue
+                ? RedisConvert.FromRedisValue<T>(redisValue)
+                : default(T);
+
+            return new TryGetResult<T>(hasValue, value);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.SetAsync{T}" />
+        public Task SetAsync<T>(string key, T value, TimeSpan expiration)
+        {
+            return InternalSetAsync(key, value, expiration, When.Always);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.CreateAsync{T}" />
+        public Task<bool> CreateAsync<T>(string key, T value, TimeSpan expiration)
+        {
+            return InternalSetAsync(key, value, expiration, When.NotExists);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.RemoveAsync" />
+        public Task<bool> RemoveAsync(string key)
+        {
+            var db = _redis.GetDatabase(_databaseNumber);
+            return db.KeyDeleteAsync(key);
+        }
+
+        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseAsync{T}" />
+        public async Task<T> IncreaseAsync<T>(string key, T increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+
+            var incrTask = tran.StringIncrementAsync(key, incrementLong);
+            var tranSucc = await tran.ExecuteAsync();
+
+            if (!tranSucc)
+                return default(T);
+
+            // 根据SE.Redis的文档，await ExecuteAsync 之后，事务内的操作肯定都完成了，
+            // 所以这里其实是可以访问 incrTask.Result 的。但我们应当尽量避免在 async
+            // 代码内这样做，所以这里仍然 await 之。
+            return (T)Convert.ChangeType(await incrTask, typeof(T));
+        }
+
+        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseOrCreateAsync{T}" />
+        public async Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = await db.StringIncrementAsync(key, incrementLong);
+
+            // 如果值是新建的，需要设置其超时时间。
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
+            {
+                await db.KeyExpireAsync(key, expiration);
             }
 
             return (T)Convert.ChangeType(res, typeof(T));
@@ -108,6 +180,14 @@ namespace cmstar.Caching.Redis
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = RedisConvert.ToRedisValue(value);
             return db.StringSet(key, redisValue, e, when);
+        }
+
+        private Task<bool> InternalSetAsync<T>(string key, T value, TimeSpan expiration, When when)
+        {
+            var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
+            var db = _redis.GetDatabase(_databaseNumber);
+            var redisValue = RedisConvert.ToRedisValue(value);
+            return db.StringSetAsync(key, redisValue, e, when);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Redis;
 
 namespace cmstar.Caching.Redis
@@ -6,7 +7,8 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 基于redis的hash实现的缓存提供器。
     /// </summary>
-    public class RedisHashCacheProvider : ICacheFieldIncreasable, ICacheIncreasable
+    public class RedisHashCacheProvider
+        : ICacheFieldIncreasable, ICacheIncreasable, ICacheFieldIncreasableAsync, ICacheIncreasableAsync
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -85,7 +87,7 @@ namespace cmstar.Caching.Redis
             var res = db.HashIncrement(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
 
             // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
-            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
             {
                 db.KeyExpire(key, expiration);
             }
@@ -120,14 +122,8 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldAccessable.FieldSet{T,TField}" />
         public bool FieldSet<T, TField>(string key, string field, TField value)
         {
-            var redisValue = RedisConvert.ToRedisValue(value);
-            var db = _redis.GetDatabase(_databaseNumber);
-
-            var tran = db.CreateTransaction();
-            tran.AddCondition(Condition.HashExists(key, field));
-            tran.HashSetAsync(key, field, redisValue);
-            var res = tran.Execute();
-            return res;
+            var tran = PrepareTransationForFieldSet(key, field, value);
+            return tran.Execute();
         }
 
         /// <inheritdoc cref="ICacheFieldAccessable.FieldSetOrCreate{T,TField}" />
@@ -166,7 +162,164 @@ namespace cmstar.Caching.Redis
             var res = db.HashIncrement(key, field, incrementLong);
 
             // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
-            if (res == incrementLong && !TimeSpan.Zero.Equals(expiration))
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return (TField)Convert.ChangeType(res, typeof(TField));
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.GetAsync{T}" />
+        public async Task<T> GetAsync<T>(string key)
+        {
+            var res = await TryGetAsync<T>(key);
+            return res.Value;
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.TryGetAsync{T}" />
+        public async Task<TryGetResult<T>> TryGetAsync<T>(string key)
+        {
+            var db = _redis.GetDatabase(_databaseNumber);
+            var hasValue = await db.KeyExistsAsync(key);
+
+            T value;
+            if (hasValue)
+            {
+                var hashEntries = db.HashScan(key);
+                value = RedisConvert.FromCacheEntries<T>(hashEntries);
+            }
+            else
+            {
+                value = default(T);
+            }
+
+            return new TryGetResult<T>(hasValue, value);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.SetAsync{T}" />
+        public Task SetAsync<T>(string key, T value, TimeSpan expiration)
+        {
+            return CreateOrSetAsync(key, value, expiration, false);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.CreateAsync{T}" />
+        public Task<bool> CreateAsync<T>(string key, T value, TimeSpan expiration)
+        {
+            return CreateOrSetAsync(key, value, expiration, true);
+        }
+
+        /// <inheritdoc cref="ICacheProviderAsync.RemoveAsync" />
+        public Task<bool> RemoveAsync(string key)
+        {
+            var db = _redis.GetDatabase(_databaseNumber);
+            return db.KeyDeleteAsync(key);
+        }
+
+        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseAsync{T}" />
+        public async Task<T> IncreaseAsync<T>(string key, T increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+
+            var incrTask = tran.HashIncrementAsync(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
+            var tranSucc = await tran.ExecuteAsync();
+
+            if (!tranSucc)
+                return default(T);
+
+            // 根据SE.Redis的文档，await ExecuteAsync 之后，事务内的操作肯定都完成了，
+            // 所以这里其实是可以访问 incrTask.Result 的。但我们应当尽量避免在 async
+            // 代码内这样做，所以这里仍然 await 之。
+            return (T)Convert.ChangeType(await incrTask, typeof(T));
+        }
+
+        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseOrCreateAsync{T}" />
+        public async Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = await db.HashIncrementAsync(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
+
+            // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
+            {
+                db.KeyExpire(key, expiration);
+            }
+
+            return (T)Convert.ChangeType(res, typeof(T));
+        }
+
+        /// <inheritdoc cref="ICacheFieldAccessableAsync.FieldGetAsync{T,TField}"/>
+        public async Task<TField> FieldGetAsync<T, TField>(string key, string field)
+        {
+            var res = await FieldTryGetAsync<T, TField>(key, field);
+            return res.Value;
+        }
+
+        /// <inheritdoc cref="ICacheFieldAccessableAsync.FieldTryGetAsync{T,TField}"/>
+        public async Task<TryGetResult<TField>> FieldTryGetAsync<T, TField>(string key, string field)
+        {
+            var db = _redis.GetDatabase(_databaseNumber);
+            var redisValue = await db.HashGetAsync(key, field);
+
+            var hasValue = !redisValue.IsNull;
+            var value = hasValue
+                ? RedisConvert.FromRedisValue<TField>(redisValue)
+                : default(TField);
+
+            return new TryGetResult<TField>(hasValue, value);
+        }
+
+        /// <inheritdoc cref="ICacheFieldAccessableAsync.FieldSetAsync{T,TField}"/>
+        public Task<bool> FieldSetAsync<T, TField>(string key, string field, TField value)
+        {
+            var tran = PrepareTransationForFieldSet(key, field, value);
+            return tran.ExecuteAsync();
+        }
+
+        /// <inheritdoc cref="ICacheFieldAccessableAsync.FieldSetOrCreateAsync{T,TField}"/>
+        public async Task<bool> FieldSetOrCreateAsync<T, TField>(string key, string field, TField value, TimeSpan expiration)
+        {
+            var redisValue = RedisConvert.ToRedisValue(value);
+            var db = _redis.GetDatabase(_databaseNumber);
+
+            if (await db.HashSetAsync(key, field, redisValue))
+            {
+                await db.KeyExpireAsync(key, expiration);
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc cref="ICacheFieldIncreasableAsync.FieldIncreaseAsync{T,TField}"/>
+        public async Task<TField> FieldIncreaseAsync<T, TField>(string key, string field, TField increment)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.HashExists(key, field));
+
+            var incrTask = tran.HashIncrementAsync(key, field, incrementLong);
+            var tranSucc = await tran.ExecuteAsync();
+
+            if (!tranSucc)
+                return default(TField);
+
+            return (TField)Convert.ChangeType(await incrTask, typeof(TField));
+        }
+
+        /// <inheritdoc cref="ICacheFieldIncreasableAsync.FieldIncreaseOrCreateAsync{T,TField}"/>
+        public async Task<TField> FieldIncreaseOrCreateAsync<T, TField>(string key, string field, TField increment, TimeSpan expiration)
+        {
+            var incrementLong = Convert.ToInt64(increment);
+            var db = _redis.GetDatabase(_databaseNumber);
+            var res = await db.HashIncrementAsync(key, field, incrementLong);
+
+            // 超时的处理采用和RedisCacheProvider.IncreaseOrCreate相同的方式
+            if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
             {
                 db.KeyExpire(key, expiration);
             }
@@ -175,6 +328,18 @@ namespace cmstar.Caching.Redis
         }
 
         private bool CreateOrSet<T>(string key, T value, TimeSpan expiration, bool create)
+        {
+            var tran = PrepareTransactionForCreateOrSet(key, value, expiration, create);
+            return tran.Execute();
+        }
+
+        private async Task<bool> CreateOrSetAsync<T>(string key, T value, TimeSpan expiration, bool create)
+        {
+            var tran = PrepareTransactionForCreateOrSet(key, value, expiration, create);
+            return await tran.ExecuteAsync();
+        }
+
+        private ITransaction PrepareTransactionForCreateOrSet<T>(string key, T value, TimeSpan expiration, bool create)
         {
             bool shouldRemoveSpecialEntry;
             var hashEntries = RedisConvert.ToHashEntries(value, out shouldRemoveSpecialEntry);
@@ -194,7 +359,20 @@ namespace cmstar.Caching.Redis
 
             tran.HashSetAsync(key, hashEntries);
             tran.KeyExpireAsync(key, e);
-            return tran.Execute();
+
+            return tran;
+        }
+
+        private ITransaction PrepareTransationForFieldSet<TField>(string key, string field, TField value)
+        {
+            var redisValue = RedisConvert.ToRedisValue(value);
+            var db = _redis.GetDatabase(_databaseNumber);
+
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.HashExists(key, field));
+            tran.HashSetAsync(key, field, redisValue);
+
+            return tran;
         }
     }
 }

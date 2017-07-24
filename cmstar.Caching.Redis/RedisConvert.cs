@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using cmstar.Caching.Reflection;
 using cmstar.RapidReflection.Emit;
 using cmstar.Serialization.Json;
@@ -407,6 +408,22 @@ namespace cmstar.Caching.Redis
         {
             var dataType = GetDataType(type);
             return dataType != RedisDataType.Object;
+        }
+
+        /// <summary>
+        /// 在对一个值进行 INCR* 操作后，判断返回的值是否是新建的。
+        /// </summary>
+        /// <param name="result">INCR* 的返回值。</param>
+        /// <param name="increment">增量，必须是整数，或能够转换为整数。使用负数来做减法。</param>
+        /// <returns>true若值为新建的；否则表明值原来是存在的，INCR更新了该值。</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNewlyCreatedAfterIncreasing(long result, long increment)
+        {
+            // redis 的 INCR* 命令本身没有提供在新建值的同时设置过期时间的机制，
+            // 附带超时时间时，需要先 INCR* 再设置过期时间。
+            // 然而 INCR* 仅返回 INCR* 后的值，并不说明值是刚新建的还是原有值更新的，
+            // 我们只能在 INCR* 后的值与增量一致时，推断其是新建的。
+            return result == increment;
         }
 
         private static byte[] ConvertToBinary(RedisValue value)
