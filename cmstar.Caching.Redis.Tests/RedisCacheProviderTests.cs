@@ -34,5 +34,19 @@ namespace cmstar.Caching.Redis
         {
             protected override ICacheIncreasable CacheProvider => Cache;
         }
+
+        [TestFixture]
+        public class RedisCacheProviderAsyncBasicTests : CacheProviderTestBase
+        {
+            protected override ICacheProvider CacheProvider { get; }
+                = new CacheProviderAdapter(Cache);
+        }
+
+        [TestFixture]
+        public class RedisCacheProviderIncreasableAsyncTests : CacheIncreasableTestBase
+        {
+            protected override ICacheIncreasable CacheProvider { get; }
+                = new CacheIncreasableAdapter(Cache);
+        }
     }
 }
