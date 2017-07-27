@@ -52,15 +52,12 @@
     <Compile Include="CacheValue.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
-    <Compile Include="ICacheFieldAccessableAsync.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />
-    <Compile Include="ICacheFieldIncreasableAsync.cs" />
     <Compile Include="ICacheIncreasable.cs" />
-    <Compile Include="ICacheIncreasableAsync.cs" />
     <Compile Include="ICacheProvider.cs" />
-    <Compile Include="ICacheProviderAsync.cs" />
     <Compile Include="KeyOperation.cs" />
     <Compile Include="L2CacheProvider.cs" />
+    <Compile Include="L2CacheProvider_Async.cs" />
     <Compile Include="MemoryBasedCacheProvider.cs" />
     <Compile Include="MemoryBasedCacheProvider_Async.cs" />
     <Compile Include="MemoryCacheProvider.cs" />

@@ -7,7 +7,7 @@ namespace cmstar.Caching.Redis
     /// <summary>
     /// 使用Redis作为缓存的缓存提供器。
     /// </summary>
-    public class RedisCacheProvider : ICacheIncreasable, ICacheIncreasableAsync
+    public class RedisCacheProvider : ICacheIncreasable
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly int _databaseNumber;
@@ -97,14 +97,14 @@ namespace cmstar.Caching.Redis
             return (T)Convert.ChangeType(res, typeof(T));
         }
 
-        /// <inheritdoc cref="ICacheProviderAsync.GetAsync{T}" />
+        /// <inheritdoc cref="ICacheProvider.GetAsync{T}" />
         public async Task<T> GetAsync<T>(string key)
         {
             var res = await TryGetAsync<T>(key);
             return res.Value;
         }
 
-        /// <inheritdoc cref="ICacheProviderAsync.TryGetAsync{T}" />
+        /// <inheritdoc cref="ICacheProvider.TryGetAsync{T}" />
         public async Task<TryGetResult<T>> TryGetAsync<T>(string key)
         {
             var db = _redis.GetDatabase(_databaseNumber);
@@ -118,26 +118,26 @@ namespace cmstar.Caching.Redis
             return new TryGetResult<T>(hasValue, value);
         }
 
-        /// <inheritdoc cref="ICacheProviderAsync.SetAsync{T}" />
+        /// <inheritdoc cref="ICacheProvider.SetAsync{T}" />
         public Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
             return InternalSetAsync(key, value, expiration, When.Always);
         }
 
-        /// <inheritdoc cref="ICacheProviderAsync.CreateAsync{T}" />
+        /// <inheritdoc cref="ICacheProvider.CreateAsync{T}" />
         public Task<bool> CreateAsync<T>(string key, T value, TimeSpan expiration)
         {
             return InternalSetAsync(key, value, expiration, When.NotExists);
         }
 
-        /// <inheritdoc cref="ICacheProviderAsync.RemoveAsync" />
+        /// <inheritdoc cref="ICacheProvider.RemoveAsync" />
         public Task<bool> RemoveAsync(string key)
         {
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDeleteAsync(key);
         }
 
-        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseAsync{T}" />
+        /// <inheritdoc cref="ICacheIncreasable.IncreaseAsync{T}" />
         public async Task<T> IncreaseAsync<T>(string key, T increment)
         {
             var incrementLong = Convert.ToInt64(increment);
@@ -158,7 +158,7 @@ namespace cmstar.Caching.Redis
             return (T)Convert.ChangeType(await incrTask, typeof(T));
         }
 
-        /// <inheritdoc cref="ICacheIncreasableAsync.IncreaseOrCreateAsync{T}" />
+        /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreateAsync{T}" />
         public async Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration)
         {
             var incrementLong = Convert.ToInt64(increment);

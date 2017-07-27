@@ -48,6 +48,7 @@
     <Compile Include="CacheValueClass.cs" />
     <Compile Include="CacheValueStruct.cs" />
     <Compile Include="HttpRuntimeCacheProviderTests.cs" />
+    <Compile Include="L2CacheProviderTests.cs" />
     <Compile Include="MemoryCacheProviderTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,13 +1,12 @@
-﻿using System;
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System;
 using System.Threading.Tasks;
 
 namespace cmstar.Caching
 {
-    /// <summary>
-    /// 提供基于当前程序域使用的内存的缓存的基本读写操作，并基于这些操作进行的扩展及提供线程安全控制。
-    /// 这是一个抽象类。
-    /// </summary>
-    public abstract partial class MemoryBasedCacheProvider : ICacheIncreasableAsync, ICacheFieldIncreasableAsync
+    // MemoryBasedCacheProvider 的异步操作的实现，实际上全部是非异步处理的。
+    public abstract partial class MemoryBasedCacheProvider
     {
         public Task<T> GetAsync<T>(string key)
         {
