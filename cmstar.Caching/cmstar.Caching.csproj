@@ -56,6 +56,7 @@
     <Compile Include="ICacheIncreasable.cs" />
     <Compile Include="ICacheProvider.cs" />
     <Compile Include="KeyOperation.cs" />
+    <Compile Include="KeyOperation_Async.cs" />
     <Compile Include="L2CacheProvider.cs" />
     <Compile Include="L2CacheProvider_Async.cs" />
     <Compile Include="MemoryBasedCacheProvider.cs" />

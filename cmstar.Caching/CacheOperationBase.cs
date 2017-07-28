@@ -32,38 +32,29 @@
         /// <summary>
         /// 获取当前实例绑定的缓存过期设置。
         /// </summary>
-        public CacheExpiration Expiration { get; private set; }
+        public CacheExpiration Expiration { get; }
 
         /// <summary>
         /// 获取当前实例所使用的缓存提供器。
         /// </summary>
-        public ICacheProvider CacheProvider { get; private set; }
+        public ICacheProvider CacheProvider { get; }
 
         /// <summary>
         /// 当前使用的缓存提供器是否支持缓存值的增减操作。
         /// 若为true，则<see cref="CacheProvider"/>实现了<see cref="ICacheIncreasable"/>。
         /// </summary>
-        public bool CanIncrease
-        {
-            get { return CacheProvider is ICacheIncreasable; }
-        }
+        public bool CanIncrease => CacheProvider is ICacheIncreasable;
 
         /// <summary>
         /// 当前使用的缓存提供器是否支持缓存对象的字段操作。
         /// 若为true，则<see cref="CacheProvider"/>实现了<see cref="ICacheFieldAccessable"/>。
         /// </summary>
-        public bool CanAccessField
-        {
-            get { return CacheProvider is ICacheFieldAccessable; }
-        }
+        public bool CanAccessField => CacheProvider is ICacheFieldAccessable;
 
         /// <summary>
         /// 当前使用的缓存提供器是否支持缓存对象的字段值的增减操作。
         /// 若为true，则<see cref="CacheProvider"/>实现了<see cref="ICacheFieldIncreasable"/>。
         /// </summary>
-        public bool CanIncreaseField
-        {
-            get { return CacheProvider is ICacheFieldIncreasable; }
-        }
+        public bool CanIncreaseField => CacheProvider is ICacheFieldIncreasable;
     }
 }
