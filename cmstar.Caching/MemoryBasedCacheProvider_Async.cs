@@ -31,7 +31,7 @@ namespace cmstar.Caching
         public Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
             Set(key, value, expiration);
-            return Task.Delay(0);
+            return Task.CompletedTask;
         }
 
         public Task<bool> RemoveAsync(string key)
