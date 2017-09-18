@@ -47,8 +47,14 @@
     <Compile Include="CacheProviderTestBase.cs" />
     <Compile Include="CacheValueClass.cs" />
     <Compile Include="CacheValueStruct.cs" />
+    <Compile Include="CountedCacheProvider.cs" />
     <Compile Include="HttpRuntimeCacheProviderTests.cs" />
     <Compile Include="L2CacheProviderTests.cs" />
+    <Compile Include="LoadBalancing\BalancerApiCounter.cs" />
+    <Compile Include="LoadBalancing\CacheBalancerTests.cs" />
+    <Compile Include="LoadBalancing\CacheFieldAccessableBalancerTests.cs" />
+    <Compile Include="LoadBalancing\CacheFieldIncreasableBalancerTests.cs" />
+    <Compile Include="LoadBalancing\CacheIncreasableBalancerTests.cs" />
     <Compile Include="MemoryCacheProviderTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

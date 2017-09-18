@@ -60,6 +60,11 @@
     <Compile Include="KeyOperation_Async.cs" />
     <Compile Include="L2CacheProvider.cs" />
     <Compile Include="L2CacheProvider_Async.cs" />
+    <Compile Include="LoadBalancing\CacheBalancer.cs" />
+    <Compile Include="LoadBalancing\CacheFieldAccessableBalancer.cs" />
+    <Compile Include="LoadBalancing\CacheFieldIncreasableBalancer.cs" />
+    <Compile Include="LoadBalancing\CacheIncreasableBalancer.cs" />
+    <Compile Include="LoadBalancing\CacheNodeSelector.cs" />
     <Compile Include="MemoryBasedCacheProvider.cs" />
     <Compile Include="MemoryBasedCacheProvider_Async.cs" />
     <Compile Include="MemoryCacheProvider.cs" />
