@@ -50,6 +50,7 @@
     <Compile Include="CacheOperationBase.cs" />
     <Compile Include="CacheUtils.cs" />
     <Compile Include="CacheValue.cs" />
+    <Compile Include="EmptyCacheProvider.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />
