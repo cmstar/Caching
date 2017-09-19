@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheProviderTestBase.cs" />
     <Compile Include="L2CacheProviderTests.cs" />
     <Compile Include="L2RedisCacheProviderTests.cs" />
     <Compile Include="Program.cs" />
