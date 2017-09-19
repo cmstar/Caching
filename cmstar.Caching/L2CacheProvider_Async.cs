@@ -20,7 +20,7 @@ namespace cmstar.Caching
             if (res.HasValue)
                 return res;
 
-            res = await _level1.TryGetAsync<T>(key);
+            res = await _level2.TryGetAsync<T>(key);
             if (res.HasValue)
             {
                 await SetLevel1Async(key, res.Value);
