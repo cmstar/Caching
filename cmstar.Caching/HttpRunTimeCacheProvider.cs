@@ -26,7 +26,7 @@ namespace cmstar.Caching
         {
             var e = TimeSpan.Zero.Equals(expiration)
                 ? DateTime.MaxValue
-                : DateTime.Now.Add(expiration);
+                : DateTime.UtcNow.Add(expiration);
             HttpRuntime.Cache.Insert(key, value, null, e, Cache.NoSlidingExpiration);
         }
 
@@ -34,7 +34,7 @@ namespace cmstar.Caching
         {
             var e = TimeSpan.Zero.Equals(expiration)
                 ? DateTime.MaxValue
-                : DateTime.Now.Add(expiration);
+                : DateTime.UtcNow.Add(expiration);
 
             var oldValue = HttpRuntime.Cache.Add(
                 key, value, null, e, Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
