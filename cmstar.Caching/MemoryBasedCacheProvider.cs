@@ -13,9 +13,6 @@ namespace cmstar.Caching
     {
         private readonly SpinKeyLock<string> _lock = new SpinKeyLock<string>();
 
-        private static readonly ConcurrentDictionary<TypeMemberIndentity, Type> MemberTypes
-            = new ConcurrentDictionary<TypeMemberIndentity, Type>();
-
         public T Get<T>(string key)
         {
             ArgAssert.NotNullOrEmpty(key, "key");
@@ -365,7 +362,10 @@ namespace cmstar.Caching
             DoSet(key, cacheValue, expiration);
         }
 
-        private Type ResolveMemberType(Type type, string memberName)
+        private static readonly ConcurrentDictionary<TypeMemberIndentity, Type> MemberTypes
+            = new ConcurrentDictionary<TypeMemberIndentity, Type>();
+
+        private static Type ResolveMemberType(Type type, string memberName)
         {
             var id = new TypeMemberIndentity(type, memberName);
             return MemberTypes.GetOrAdd(id, x =>
@@ -378,7 +378,7 @@ namespace cmstar.Caching
                 if (fieldInfo != null)
                     return fieldInfo.FieldType;
 
-                var msg = string.Format("The member '{0}' was not found on type '{1}'.", memberName, type);
+                var msg = $"The member '{memberName}' was not found on type '{type}'.";
                 throw new InvalidOperationException(msg);
             });
         }
