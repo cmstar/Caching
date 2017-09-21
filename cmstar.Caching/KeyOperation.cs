@@ -4,25 +4,49 @@ using cmstar.Caching.Reflection;
 
 namespace cmstar.Caching
 {
-    public partial class KeyOperation<TValue>
+    public partial struct KeyOperation<TValue>
     {
         private readonly CacheOperationBase _cacheManager;
+        private readonly string _key;
 
         internal KeyOperation(CacheOperationBase cacheManager, string key)
         {
             _cacheManager = cacheManager;
-            Key = key;
+            _key = key;
+        }
+
+        /// <summary>
+        /// 获取创建了当前<see cref="KeyOperation{TValue}"/>的<see cref="CacheOperationBase"/>实例。
+        /// </summary>
+        internal CacheOperationBase CacheManager
+        {
+            get
+            {
+                if (_cacheManager == null)
+                    throw new InvalidOperationException($"The member {nameof(CacheManager)} was not initialized.");
+
+                return _cacheManager;
+            }
         }
 
         /// <summary>
         /// 获取当前使用的缓存键。
         /// </summary>
-        public string Key { get; }
+        public string Key
+        {
+            get
+            {
+                if (_key == null)
+                    throw new InvalidOperationException($"The member {nameof(Key)} was not initialized.");
+
+                return _key;
+            }
+        }
 
         /// <summary>
         /// 获取当前绑定的基本缓存超时时间，单位为秒。
         /// </summary>
-        public int BaseExpirationSeconds => _cacheManager.Expiration.BaseExpirationSeconds;
+        public int BaseExpirationSeconds => CacheManager.Expiration.BaseExpirationSeconds;
 
         /// <summary>
         /// 获取缓存值。
@@ -34,7 +58,7 @@ namespace cmstar.Caching
         /// </remarks>
         public TValue Get()
         {
-            return _cacheManager.CacheProvider.Get<TValue>(Key);
+            return CacheManager.CacheProvider.Get<TValue>(Key);
         }
 
         /// <summary>
@@ -44,7 +68,7 @@ namespace cmstar.Caching
         /// <returns>true若缓存存在；否则为false。</returns>
         public bool TryGet(out TValue value)
         {
-            return _cacheManager.CacheProvider.TryGet(Key, out value);
+            return CacheManager.CacheProvider.TryGet(Key, out value);
         }
 
         /// <summary>
@@ -53,7 +77,7 @@ namespace cmstar.Caching
         /// <param name="value">缓存的值。</param>
         public void Set(TValue value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             Set(value, expirationSeconds);
         }
 
@@ -64,7 +88,7 @@ namespace cmstar.Caching
         /// <param name="expirationSeconds">超时时间，单位为秒。</param>
         public void Set(TValue value, int expirationSeconds)
         {
-            _cacheManager.CacheProvider.Set(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            CacheManager.CacheProvider.Set(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -74,7 +98,7 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public bool Create(TValue value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             return Create(value, expirationSeconds);
         }
 
@@ -86,7 +110,7 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public bool Create(TValue value, int expirationSeconds)
         {
-            return _cacheManager.CacheProvider.Create(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            return CacheManager.CacheProvider.Create(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -95,7 +119,7 @@ namespace cmstar.Caching
         /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
         public bool Remove()
         {
-            return _cacheManager.CacheProvider.Remove(Key);
+            return CacheManager.CacheProvider.Remove(Key);
         }
 
         /// <summary>
@@ -113,7 +137,7 @@ namespace cmstar.Caching
         /// </summary>
         public TValue IncreaseOrCreate(TValue increment)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             return IncreaseOrCreate(increment, expirationSeconds);
         }
 
@@ -193,7 +217,7 @@ namespace cmstar.Caching
         /// </summary>
         public bool FieldSetOrCreate<TField>(string field, TField value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             return FieldSetOrCreate(field, value, expirationSeconds);
         }
 
@@ -255,7 +279,7 @@ namespace cmstar.Caching
         /// </summary>
         public TField FieldIncreaseOrCreate<TField>(string field, TField increment)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             var res = FieldIncreaseOrCreate(field, increment, expirationSeconds);
             return res;
         }
@@ -297,7 +321,7 @@ namespace cmstar.Caching
 
         private ICacheIncreasable GetCacheIncreasableProvider()
         {
-            var res = _cacheManager.CacheProvider as ICacheIncreasable;
+            var res = CacheManager.CacheProvider as ICacheIncreasable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -306,7 +330,7 @@ namespace cmstar.Caching
 
         private ICacheFieldAccessable GetCacheFieldAccessableProvider()
         {
-            var res = _cacheManager.CacheProvider as ICacheFieldAccessable;
+            var res = CacheManager.CacheProvider as ICacheFieldAccessable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -315,7 +339,7 @@ namespace cmstar.Caching
 
         private ICacheFieldIncreasable GetCacheFieldIncreasableProvider()
         {
-            var res = _cacheManager.CacheProvider as ICacheFieldIncreasable;
+            var res = CacheManager.CacheProvider as ICacheFieldIncreasable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -324,7 +348,7 @@ namespace cmstar.Caching
 
         private InvalidOperationException InvalidOperationError()
         {
-            var msg = $"The operation is not valid on the cache provider {_cacheManager.CacheProvider.GetType()}.";
+            var msg = $"The operation is not valid on the cache provider {CacheManager.CacheProvider.GetType()}.";
             return new InvalidOperationException(msg);
         }
     }

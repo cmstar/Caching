@@ -6,7 +6,7 @@ using cmstar.Caching.Reflection;
 namespace cmstar.Caching
 {
     // KeyOperation 的异步操作部分。
-    public partial class KeyOperation<TValue>
+    public partial struct KeyOperation<TValue>
     {
         /// <summary>
         /// 获取缓存值。
@@ -15,7 +15,7 @@ namespace cmstar.Caching
         /// <returns>缓存的值。若缓存不存在，返回null。</returns>
         public Task<TValue> GetAsync()
         {
-            return _cacheManager.CacheProvider.GetAsync<TValue>(Key);
+            return CacheManager.CacheProvider.GetAsync<TValue>(Key);
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<TryGetResult<TValue>> TryGetAsync()
         {
-            return _cacheManager.CacheProvider.TryGetAsync<TValue>(Key);
+            return CacheManager.CacheProvider.TryGetAsync<TValue>(Key);
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace cmstar.Caching
         /// <param name="value">缓存的值。</param>
         public Task SetAsync(TValue value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
-            return _cacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            return CacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace cmstar.Caching
         /// <param name="expirationSeconds">超时时间，单位为秒。</param>
         public Task SetAsync(TValue value, int expirationSeconds)
         {
-            return _cacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            return CacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public Task<bool> CreateAsync(TValue value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
-            return _cacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            return CacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public Task<bool> CreateAsync(TValue value, int expirationSeconds)
         {
-            return _cacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            return CacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace cmstar.Caching
         /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
         public Task<bool> RemoveAsync()
         {
-            return _cacheManager.CacheProvider.RemoveAsync(Key);
+            return CacheManager.CacheProvider.RemoveAsync(Key);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<TValue> IncreaseOrCreateAsync(TValue increment)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             return IncreaseOrCreateAsync(increment, expirationSeconds);
         }
 
@@ -188,7 +188,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<bool> FieldSetOrCreateAsync<TField>(string field, TField value)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             return FieldSetOrCreateAsync(field, value, expirationSeconds);
         }
 
@@ -256,7 +256,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<TField> FieldIncreaseOrCreateAsync<TField>(string field, TField increment)
         {
-            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
             var res = FieldIncreaseOrCreateAsync(field, increment, expirationSeconds);
             return res;
         }
