@@ -15,7 +15,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -56,7 +71,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -89,7 +119,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -124,7 +169,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -161,7 +221,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -200,7 +275,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -241,7 +331,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -284,7 +389,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 
@@ -329,7 +449,22 @@
         /// <param name="expiration">设定缓存的超时时间。</param>
         public CacheOperation(
             string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
-            : base(cacheNamespace, keyRoot, provider, expiration)
+            : base(cacheNamespace, keyRoot, provider, expiration, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="cacheNamespace">指定缓存键所在的命名空间。</param>
+        /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
+        /// <param name="provider">缓存提供器。</param>
+        /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">指定用于当前实例的<see cref="ICacheOperationObserver"/>。</param>
+        public CacheOperation(
+            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration,
+            ICacheOperationObserver observer = null)
+            : base(cacheNamespace, keyRoot, provider, expiration, observer)
         {
         }
 

@@ -5,8 +5,15 @@
     /// </summary>
     public abstract class CacheOperationBase
     {
-        protected readonly string CacheNamespace;
-        protected readonly string KeyBase;
+        /// <summary>
+        /// 缓存键的命名空间，用于缓存空间的管理（目前并没有实现）。
+        /// </summary>
+        public readonly string CacheNamespace;
+
+        /// <summary>
+        /// 缓存键的完整前缀，以命名空间开头，格式如 NAMESPACE:KEYROOT。
+        /// </summary>
+        public readonly string KeyBase;
 
         /// <summary>
         /// 初始化类型的新实例。
@@ -15,16 +22,25 @@
         /// <param name="keyRoot">指定用于构建缓存键的前缀。</param>
         /// <param name="provider">缓存提供器。</param>
         /// <param name="expiration">设定缓存的超时时间。</param>
+        /// <param name="observer">
+        /// 指定用于当前实例的<see cref="ICacheOperationObserver"/>，若不需要绑定
+        /// <see cref="ICacheOperationObserver"/>，使用<c>null</c>。
+        /// </param>
         protected CacheOperationBase(
-            string cacheNamespace, string keyRoot, ICacheProvider provider, CacheExpiration expiration)
+            string cacheNamespace,
+            string keyRoot,
+            ICacheProvider provider,
+            CacheExpiration expiration,
+            ICacheOperationObserver observer)
         {
-            ArgAssert.NotNull(provider, "provider");
-            ArgAssert.NotNull(expiration, "expiration");
-            ArgAssert.NotNullOrEmpty(keyRoot, "keyRoot");
+            ArgAssert.NotNull(provider, nameof(provider));
+            ArgAssert.NotNull(expiration, nameof(expiration));
+            ArgAssert.NotNullOrEmpty(keyRoot, nameof(keyRoot));
 
             CacheProvider = provider;
             Expiration = expiration;
             CacheNamespace = cacheNamespace;
+            Observer = observer;
 
             KeyBase = string.Concat(CacheNamespace, ":", keyRoot);
         }
@@ -38,6 +54,11 @@
         /// 获取当前实例所使用的缓存提供器。
         /// </summary>
         public ICacheProvider CacheProvider { get; }
+
+        /// <summary>
+        /// 获取或设置当前实例所绑定的<see cref="ICacheOperationObserver"/>，若没有绑定，值为<c>null</c>。
+        /// </summary>
+        public ICacheOperationObserver Observer { get; set; }
 
         /// <summary>
         /// 当前使用的缓存提供器是否支持缓存值的增减操作。

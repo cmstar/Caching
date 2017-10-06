@@ -1,14 +1,26 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using cmstar.Caching.Reflection;
 
 namespace cmstar.Caching
 {
+    /// <summary>
+    /// 包含对缓存提供器上的一个特定的缓存键的操作。
+    /// </summary>
     public partial struct KeyOperation<TValue>
     {
         private readonly CacheOperationBase _cacheManager;
         private readonly string _key;
 
+        /// <summary>
+        /// 创建<see cref="KeyOperation{TValue}"/>。
+        /// 必须总是通过此构造函数创建，否则所依赖成员不能被正确初始化。
+        /// </summary>
+        /// <param name="cacheManager">
+        /// 创建当前<see cref="KeyOperation{TValue}"/>的<see cref="CacheOperationBase"/>实例。
+        /// </param>
+        /// <param name="key">缓存的key。</param>
         internal KeyOperation(CacheOperationBase cacheManager, string key)
         {
             _cacheManager = cacheManager;
@@ -16,37 +28,19 @@ namespace cmstar.Caching
         }
 
         /// <summary>
-        /// 获取创建了当前<see cref="KeyOperation{TValue}"/>的<see cref="CacheOperationBase"/>实例。
-        /// </summary>
-        internal CacheOperationBase CacheManager
-        {
-            get
-            {
-                if (_cacheManager == null)
-                    throw new InvalidOperationException($"The member {nameof(CacheManager)} was not initialized.");
-
-                return _cacheManager;
-            }
-        }
-
-        /// <summary>
         /// 获取当前使用的缓存键。
         /// </summary>
-        public string Key
-        {
-            get
-            {
-                if (_key == null)
-                    throw new InvalidOperationException($"The member {nameof(Key)} was not initialized.");
+        public string Key => _key;
 
-                return _key;
-            }
-        }
+        /// <summary>
+        /// 缓存键的完整前缀，以命名空间开头，格式如 NAMESPACE:KEYROOT。
+        /// </summary>
+        public string KeyBase => _cacheManager.KeyBase;
 
         /// <summary>
         /// 获取当前绑定的基本缓存超时时间，单位为秒。
         /// </summary>
-        public int BaseExpirationSeconds => CacheManager.Expiration.BaseExpirationSeconds;
+        public int BaseExpirationSeconds => _cacheManager.Expiration.BaseExpirationSeconds;
 
         /// <summary>
         /// 获取缓存值。
@@ -58,7 +52,13 @@ namespace cmstar.Caching
         /// </remarks>
         public TValue Get()
         {
-            return CacheManager.CacheProvider.Get<TValue>(Key);
+            // 通过 CacheProvider.Get 不能知道key是否存在——它在“key不存在”和“key存在但值为默认值”
+            // 这两种情况都返回默认值。为了能知道key是否存在，这里调用 TryGet 处理。
+            TValue value;
+            var hit = _cacheManager.CacheProvider.TryGet(_key, out value);
+
+            OnSearch(hit);
+            return value;
         }
 
         /// <summary>
@@ -68,7 +68,10 @@ namespace cmstar.Caching
         /// <returns>true若缓存存在；否则为false。</returns>
         public bool TryGet(out TValue value)
         {
-            return CacheManager.CacheProvider.TryGet(Key, out value);
+            var hit = _cacheManager.CacheProvider.TryGet(_key, out value);
+
+            OnSearch(hit);
+            return hit;
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace cmstar.Caching
         /// <param name="value">缓存的值。</param>
         public void Set(TValue value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             Set(value, expirationSeconds);
         }
 
@@ -88,7 +91,8 @@ namespace cmstar.Caching
         /// <param name="expirationSeconds">超时时间，单位为秒。</param>
         public void Set(TValue value, int expirationSeconds)
         {
-            CacheManager.CacheProvider.Set(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+            _cacheManager.CacheProvider.Set(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -98,7 +102,7 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public bool Create(TValue value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             return Create(value, expirationSeconds);
         }
 
@@ -110,7 +114,8 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public bool Create(TValue value, int expirationSeconds)
         {
-            return CacheManager.CacheProvider.Create(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+            return _cacheManager.CacheProvider.Create(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -119,7 +124,9 @@ namespace cmstar.Caching
         /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
         public bool Remove()
         {
-            return CacheManager.CacheProvider.Remove(Key);
+            var removed = _cacheManager.CacheProvider.Remove(_key);
+            OnRemove(removed);
+            return removed;
         }
 
         /// <summary>
@@ -128,7 +135,8 @@ namespace cmstar.Caching
         public TValue Increase(TValue increment)
         {
             var provider = GetCacheIncreasableProvider();
-            return provider.Increase(Key, increment);
+            OnAccess();
+            return provider.Increase(_key, increment);
         }
 
         /// <summary>
@@ -137,7 +145,7 @@ namespace cmstar.Caching
         /// </summary>
         public TValue IncreaseOrCreate(TValue increment)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             return IncreaseOrCreate(increment, expirationSeconds);
         }
 
@@ -148,8 +156,11 @@ namespace cmstar.Caching
         public TValue IncreaseOrCreate(TValue increment, int expirationSeconds)
         {
             var provider = GetCacheIncreasableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.IncreaseOrCreate(Key, increment, expiration);
+            var res = provider.IncreaseOrCreate(_key, increment, expiration);
             return res;
         }
 
@@ -159,8 +170,12 @@ namespace cmstar.Caching
         public TField FieldGet<TField>(string field)
         {
             var provider = GetCacheFieldAccessableProvider();
-            var res = provider.FieldGet<TValue, TField>(Key, field);
-            return res;
+
+            TField value;
+            var hit = provider.FieldTryGet<TValue, TField>(_key, field, out value);
+
+            OnSearch(hit);
+            return value;
         }
 
         /// <summary>
@@ -179,7 +194,10 @@ namespace cmstar.Caching
         public bool FieldTryGet<TField>(string field, out TField value)
         {
             var provider = GetCacheFieldAccessableProvider();
-            return provider.FieldTryGet<TValue, TField>(Key, field, out value);
+            var hit = provider.FieldTryGet<TValue, TField>(_key, field, out value);
+
+            OnSearch(hit);
+            return hit;
         }
 
         /// <summary>
@@ -198,7 +216,10 @@ namespace cmstar.Caching
         public bool FieldSet<TField>(string field, TField value)
         {
             var provider = GetCacheFieldAccessableProvider();
-            var res = provider.FieldSet<TValue, TField>(Key, field, value);
+
+            OnAccess();
+
+            var res = provider.FieldSet<TValue, TField>(_key, field, value);
             return res;
         }
 
@@ -217,7 +238,7 @@ namespace cmstar.Caching
         /// </summary>
         public bool FieldSetOrCreate<TField>(string field, TField value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             return FieldSetOrCreate(field, value, expirationSeconds);
         }
 
@@ -227,8 +248,11 @@ namespace cmstar.Caching
         public bool FieldSetOrCreate<TField>(string field, TField value, int expirationSeconds)
         {
             var provider = GetCacheFieldAccessableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldSetOrCreate<TValue, TField>(Key, field, value, expiration);
+            var res = provider.FieldSetOrCreate<TValue, TField>(_key, field, value, expiration);
             return res;
         }
 
@@ -259,7 +283,8 @@ namespace cmstar.Caching
         public TField FieldIncrease<TField>(string field, TField increment)
         {
             var provider = GetCacheFieldIncreasableProvider();
-            return provider.FieldIncrease<TValue, TField>(Key, field, increment);
+            OnAccess();
+            return provider.FieldIncrease<TValue, TField>(_key, field, increment);
         }
 
         /// <summary>
@@ -279,7 +304,7 @@ namespace cmstar.Caching
         /// </summary>
         public TField FieldIncreaseOrCreate<TField>(string field, TField increment)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             var res = FieldIncreaseOrCreate(field, increment, expirationSeconds);
             return res;
         }
@@ -291,8 +316,11 @@ namespace cmstar.Caching
         public TField FieldIncreaseOrCreate<TField>(string field, TField increment, int expirationSeconds)
         {
             var provider = GetCacheFieldIncreasableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldIncreaseOrCreate<TValue, TField>(Key, field, increment, expiration);
+            var res = provider.FieldIncreaseOrCreate<TValue, TField>(_key, field, increment, expiration);
             return res;
         }
 
@@ -321,7 +349,7 @@ namespace cmstar.Caching
 
         private ICacheIncreasable GetCacheIncreasableProvider()
         {
-            var res = CacheManager.CacheProvider as ICacheIncreasable;
+            var res = _cacheManager.CacheProvider as ICacheIncreasable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -330,7 +358,7 @@ namespace cmstar.Caching
 
         private ICacheFieldAccessable GetCacheFieldAccessableProvider()
         {
-            var res = CacheManager.CacheProvider as ICacheFieldAccessable;
+            var res = _cacheManager.CacheProvider as ICacheFieldAccessable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -339,7 +367,7 @@ namespace cmstar.Caching
 
         private ICacheFieldIncreasable GetCacheFieldIncreasableProvider()
         {
-            var res = CacheManager.CacheProvider as ICacheFieldIncreasable;
+            var res = _cacheManager.CacheProvider as ICacheFieldIncreasable;
             if (res == null)
                 throw InvalidOperationError();
 
@@ -348,8 +376,52 @@ namespace cmstar.Caching
 
         private InvalidOperationException InvalidOperationError()
         {
-            var msg = $"The operation is not valid on the cache provider {CacheManager.CacheProvider.GetType()}.";
+            var msg = $"The operation is not valid on the cache provider {_cacheManager.CacheProvider.GetType()}.";
             return new InvalidOperationException(msg);
+        }
+
+#if  !NET35
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private void OnAccess()
+        {
+            var observer = _cacheManager.Observer;
+            observer?.Accessed(KeyBase);
+        }
+
+        // 此方法将 ICacheOperation.Accessed + Removed 合并在一个过程中调用，
+        // 以减少对 _cacheManager.Observer 的访问和空值判断次数。
+        // 调用此方法时，不需要再调用 OnAccess。
+        private void OnRemove(bool removed)
+        {
+            var observer = _cacheManager.Observer;
+            if (observer == null)
+                return;
+
+            if (removed)
+            {
+                observer.Removed(KeyBase);
+            }
+            else
+            {
+                observer.Accessed(KeyBase);
+            }
+        }
+
+        private void OnSearch(bool hit)
+        {
+            var observer = _cacheManager.Observer;
+            if (observer == null)
+                return;
+
+            if (hit)
+            {
+                observer.Hit(KeyBase);
+            }
+            else
+            {
+                observer.Missed(KeyBase);
+            }
         }
     }
 }

@@ -50,11 +50,13 @@
     <Compile Include="CacheOperationBase.cs" />
     <Compile Include="CacheUtils.cs" />
     <Compile Include="CacheValue.cs" />
+    <Compile Include="EmptyCacheOperationObserver.cs" />
     <Compile Include="EmptyCacheProvider.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />
     <Compile Include="ICacheIncreasable.cs" />
+    <Compile Include="ICacheOperationObserver.cs" />
     <Compile Include="ICacheProvider.cs" />
     <Compile Include="KeyOperation.cs" />
     <Compile Include="KeyOperation_Async.cs" />

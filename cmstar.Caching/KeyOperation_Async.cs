@@ -13,18 +13,26 @@ namespace cmstar.Caching
         /// 若缓存提供器支持异步操作，则以异步方式处理；否则以非异步方式处理。
         /// </summary>
         /// <returns>缓存的值。若缓存不存在，返回null。</returns>
-        public Task<TValue> GetAsync()
+        public async Task<TValue> GetAsync()
         {
-            return CacheManager.CacheProvider.GetAsync<TValue>(Key);
+            // 通过 CacheProvider.GetAsync 不能知道key是否存在——它在“key不存在”和“key存在但值为默认值”
+            // 这两种情况都返回默认值。为了能知道key是否存在，这里调用 TryGet 处理。
+            var res = await _cacheManager.CacheProvider.TryGetAsync<TValue>(_key);
+
+            OnSearch(res.HasValue);
+            return res.Value;
         }
 
         /// <summary>
         /// 获取缓存值。
         /// 若缓存提供器支持异步操作，则以异步方式处理；否则以非异步方式处理。
         /// </summary>
-        public Task<TryGetResult<TValue>> TryGetAsync()
+        public async Task<TryGetResult<TValue>> TryGetAsync()
         {
-            return CacheManager.CacheProvider.TryGetAsync<TValue>(Key);
+            var res = await _cacheManager.CacheProvider.TryGetAsync<TValue>(_key);
+
+            OnSearch(res.HasValue);
+            return res;
         }
 
         /// <summary>
@@ -34,8 +42,10 @@ namespace cmstar.Caching
         /// <param name="value">缓存的值。</param>
         public Task SetAsync(TValue value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
-            return CacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            return _cacheManager.CacheProvider.SetAsync(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -46,7 +56,8 @@ namespace cmstar.Caching
         /// <param name="expirationSeconds">超时时间，单位为秒。</param>
         public Task SetAsync(TValue value, int expirationSeconds)
         {
-            return CacheManager.CacheProvider.SetAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+            return _cacheManager.CacheProvider.SetAsync(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -57,8 +68,10 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public Task<bool> CreateAsync(TValue value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
-            return CacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
+            return _cacheManager.CacheProvider.CreateAsync(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -70,7 +83,8 @@ namespace cmstar.Caching
         /// <returns>true表示创建了缓存；false说明缓存已经存在了。</returns>
         public Task<bool> CreateAsync(TValue value, int expirationSeconds)
         {
-            return CacheManager.CacheProvider.CreateAsync(Key, value, TimeSpan.FromSeconds(expirationSeconds));
+            OnAccess();
+            return _cacheManager.CacheProvider.CreateAsync(_key, value, TimeSpan.FromSeconds(expirationSeconds));
         }
 
         /// <summary>
@@ -78,9 +92,11 @@ namespace cmstar.Caching
         /// 若缓存提供器支持异步操作，则以异步方式处理；否则以非异步方式处理。
         /// </summary>
         /// <returns>true若缓存被移除；若缓存键不存在，返回false。</returns>
-        public Task<bool> RemoveAsync()
+        public async Task<bool> RemoveAsync()
         {
-            return CacheManager.CacheProvider.RemoveAsync(Key);
+            var removed = await _cacheManager.CacheProvider.RemoveAsync(_key);
+            OnRemove(removed);
+            return removed;
         }
 
         /// <summary>
@@ -90,7 +106,8 @@ namespace cmstar.Caching
         public Task<TValue> IncreaseAsync(TValue increment)
         {
             var provider = GetCacheIncreasableProvider();
-            return provider.IncreaseAsync(Key, increment);
+            OnAccess();
+            return provider.IncreaseAsync(_key, increment);
         }
 
         /// <summary>
@@ -100,7 +117,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<TValue> IncreaseOrCreateAsync(TValue increment)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             return IncreaseOrCreateAsync(increment, expirationSeconds);
         }
 
@@ -112,8 +129,11 @@ namespace cmstar.Caching
         public Task<TValue> IncreaseOrCreateAsync(TValue increment, int expirationSeconds)
         {
             var provider = GetCacheIncreasableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.IncreaseOrCreateAsync(Key, increment, expiration);
+            var res = provider.IncreaseOrCreateAsync(_key, increment, expiration);
             return res;
         }
 
@@ -121,11 +141,13 @@ namespace cmstar.Caching
         /// 在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldGetAsync{T,TField}"/>方法。
         /// 若缓存提供器支持异步操作，则以异步方式处理；否则以非异步方式处理。
         /// </summary>
-        public Task<TField> FieldGetAsync<TField>(string field)
+        public async Task<TField> FieldGetAsync<TField>(string field)
         {
             var provider = GetCacheFieldAccessableProvider();
-            var res = provider.FieldGetAsync<TValue, TField>(Key, field);
-            return res;
+            var res = await provider.FieldTryGetAsync<TValue, TField>(_key, field);
+
+            OnSearch(res.HasValue);
+            return res.Value;
         }
 
         /// <summary>
@@ -143,10 +165,13 @@ namespace cmstar.Caching
         /// 在当前对象所绑定的缓存上应用<see cref="ICacheFieldAccessable.FieldTryGetAsync{T,TField}"/>方法。
         /// 若缓存提供器支持异步操作，则以异步方式处理；否则以非异步方式处理。
         /// </summary>
-        public Task<TryGetResult<TField>> FieldTryGetAsync<TField>(string field)
+        public async Task<TryGetResult<TField>> FieldTryGetAsync<TField>(string field)
         {
             var provider = GetCacheFieldAccessableProvider();
-            return provider.FieldTryGetAsync<TValue, TField>(Key, field);
+            var res = await provider.FieldTryGetAsync<TValue, TField>(_key, field);
+
+            OnSearch(res.HasValue);
+            return res;
         }
 
         /// <summary>
@@ -167,7 +192,10 @@ namespace cmstar.Caching
         public Task<bool> FieldSetAsync<TField>(string field, TField value)
         {
             var provider = GetCacheFieldAccessableProvider();
-            var res = provider.FieldSetAsync<TValue, TField>(Key, field, value);
+
+            OnAccess();
+
+            var res = provider.FieldSetAsync<TValue, TField>(_key, field, value);
             return res;
         }
 
@@ -188,7 +216,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<bool> FieldSetOrCreateAsync<TField>(string field, TField value)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             return FieldSetOrCreateAsync(field, value, expirationSeconds);
         }
 
@@ -199,8 +227,11 @@ namespace cmstar.Caching
         public Task<bool> FieldSetOrCreateAsync<TField>(string field, TField value, int expirationSeconds)
         {
             var provider = GetCacheFieldAccessableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldSetOrCreateAsync<TValue, TField>(Key, field, value, expiration);
+            var res = provider.FieldSetOrCreateAsync<TValue, TField>(_key, field, value, expiration);
             return res;
         }
 
@@ -234,7 +265,8 @@ namespace cmstar.Caching
         public Task<TField> FieldIncreaseAsync<TField>(string field, TField increment)
         {
             var provider = GetCacheFieldIncreasableProvider();
-            return provider.FieldIncreaseAsync<TValue, TField>(Key, field, increment);
+            OnAccess();
+            return provider.FieldIncreaseAsync<TValue, TField>(_key, field, increment);
         }
 
         /// <summary>
@@ -256,7 +288,7 @@ namespace cmstar.Caching
         /// </summary>
         public Task<TField> FieldIncreaseOrCreateAsync<TField>(string field, TField increment)
         {
-            var expirationSeconds = CacheManager.Expiration.NewExpirationSeconds();
+            var expirationSeconds = _cacheManager.Expiration.NewExpirationSeconds();
             var res = FieldIncreaseOrCreateAsync(field, increment, expirationSeconds);
             return res;
         }
@@ -269,8 +301,11 @@ namespace cmstar.Caching
         public Task<TField> FieldIncreaseOrCreateAsync<TField>(string field, TField increment, int expirationSeconds)
         {
             var provider = GetCacheFieldIncreasableProvider();
+
+            OnAccess();
+
             var expiration = TimeSpan.FromSeconds(expirationSeconds);
-            var res = provider.FieldIncreaseOrCreateAsync<TValue, TField>(Key, field, increment, expiration);
+            var res = provider.FieldIncreaseOrCreateAsync<TValue, TField>(_key, field, increment, expiration);
             return res;
         }
 
