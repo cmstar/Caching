@@ -60,7 +60,7 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 当指定键的缓存存在时，获取该缓存对象的指定字段的值。
-        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldGetAsync{T,TField}"/>。
+        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldGet{T,TField}"/>。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <typeparam name="TField">字段的数据类型。</typeparam>
@@ -74,7 +74,7 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 当指定键的缓存存在时，获取该缓存对象的指定字段的值。
-        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldTryGetAsync{T,TField}"/>。
+        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldTryGet{T,TField}"/>。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <typeparam name="TField">字段的数据类型。</typeparam>
@@ -85,7 +85,7 @@ namespace cmstar.Caching
 
         /// <summary>
         /// 当指定键的缓存存在时，设置具有指定键的缓存对象的指定字段的值。
-        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldSetAsync{T,TField}"/>。
+        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldSet{T,TField}"/>。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <typeparam name="TField">字段的数据类型。</typeparam>
@@ -98,7 +98,7 @@ namespace cmstar.Caching
         /// <summary>
         /// 设置具有指定键的缓存对象的指定字段的值。
         /// 若对象或字段不存在，尝试创建对象或字段。
-        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldSetOrCreateAsync{T,TField}"/>。
+        /// 若支持异步操作，则以异步方式处理；否则以非异步方式处理，等同于<see cref="FieldSetOrCreate{T,TField}"/>。
         /// </summary>
         /// <typeparam name="T">缓存对象的类型。</typeparam>
         /// <typeparam name="TField">字段的数据类型。</typeparam>
