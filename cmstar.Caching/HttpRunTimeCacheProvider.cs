@@ -16,12 +16,14 @@ namespace cmstar.Caching
 
         private HttpRuntimeCacheProvider() { }
 
+        /// <inheritdoc />
         protected override object DoGet(string key)
         {
             var v = HttpRuntime.Cache.Get(key);
             return v;
         }
 
+        /// <inheritdoc />
         protected override void DoSet(string key, object value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
@@ -30,6 +32,7 @@ namespace cmstar.Caching
             HttpRuntime.Cache.Insert(key, value, null, e, Cache.NoSlidingExpiration);
         }
 
+        /// <inheritdoc />
         protected override bool DoCreate(string key, object value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
@@ -42,6 +45,7 @@ namespace cmstar.Caching
             return oldValue == null;
         }
 
+        /// <inheritdoc />
         protected override bool DoRemove(string key)
         {
             return HttpRuntime.Cache.Remove(key) != null;

@@ -19,12 +19,14 @@ namespace cmstar.Caching
             _cache = new MemoryCache(name);
         }
 
+        /// <inheritdoc />
         protected override object DoGet(string key)
         {
             var v = _cache.Get(key);
             return v;
         }
 
+        /// <inheritdoc />
         protected override void DoSet(string key, object value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
@@ -34,6 +36,7 @@ namespace cmstar.Caching
             _cache.Set(key, value, e);
         }
 
+        /// <inheritdoc />
         protected override bool DoCreate(string key, object value, TimeSpan expiration)
         {
             var e = TimeSpan.Zero.Equals(expiration)
@@ -43,6 +46,7 @@ namespace cmstar.Caching
             return _cache.Add(key, value, e);
         }
 
+        /// <inheritdoc />
         protected override bool DoRemove(string key)
         {
             return _cache.Remove(key) != null;

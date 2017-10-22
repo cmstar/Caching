@@ -15,7 +15,7 @@ namespace cmstar.Caching
 
         public T Get<T>(string key)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -31,7 +31,7 @@ namespace cmstar.Caching
 
         public bool TryGet<T>(string key, out T value)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -52,7 +52,7 @@ namespace cmstar.Caching
 
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -62,7 +62,7 @@ namespace cmstar.Caching
 
         public bool Create<T>(string key, T value, TimeSpan expiration)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -72,7 +72,7 @@ namespace cmstar.Caching
 
         public bool Remove(string key)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -82,7 +82,7 @@ namespace cmstar.Caching
 
         public T Increase<T>(string key, T increment)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -101,7 +101,7 @@ namespace cmstar.Caching
 
         public T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
 
             using (_lock.Enter(key))
             {
@@ -123,8 +123,8 @@ namespace cmstar.Caching
 
         public TField FieldGet<T, TField>(string key, string field)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             TField value;
             FieldTryGet<T, TField>(key, field, out value);
@@ -133,8 +133,8 @@ namespace cmstar.Caching
 
         public bool FieldTryGet<T, TField>(string key, string field, out TField value)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             var getter = TypeMemberAccessorUtils.GetGetAccessor(typeof(T), field);
             if (getter == null)
@@ -159,8 +159,8 @@ namespace cmstar.Caching
 
         public bool FieldSet<T, TField>(string key, string field, TField value)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             var setter = TypeMemberAccessorUtils.GetSetAccessor(typeof(T), field);
             if (setter == null)
@@ -184,8 +184,8 @@ namespace cmstar.Caching
 
         public bool FieldSetOrCreate<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             var setter = TypeMemberAccessorUtils.GetSetAccessor(typeof(T), field);
             if (setter == null)
@@ -220,8 +220,8 @@ namespace cmstar.Caching
 
         public TField FieldIncrease<T, TField>(string key, string field, TField increment)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             var getter = TypeMemberAccessorUtils.GetGetAccessor(typeof(T), field);
             if (getter == null)
@@ -253,8 +253,8 @@ namespace cmstar.Caching
 
         public TField FieldIncreaseOrCreate<T, TField>(string key, string field, TField increment, TimeSpan expiration)
         {
-            ArgAssert.NotNullOrEmpty(key, "key");
-            ArgAssert.NotNullOrEmpty(field, "field");
+            ArgAssert.NotNullOrEmpty(key, nameof(key));
+            ArgAssert.NotNullOrEmpty(field, nameof(field));
 
             var getter = TypeMemberAccessorUtils.GetGetAccessor(typeof(T), field);
             if (getter == null)
@@ -333,7 +333,7 @@ namespace cmstar.Caching
         {
             CacheValue cacheValue;
             var res = InternalTryGetRaw(key, out cacheValue);
-            value = cacheValue != null ? cacheValue.Value : null;
+            value = cacheValue?.Value;
             return res;
         }
 

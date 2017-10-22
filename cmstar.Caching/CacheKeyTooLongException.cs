@@ -7,6 +7,10 @@ namespace cmstar.Caching
     /// </summary>
     public class CacheKeyTooLongException : Exception
     {
+        /// <summary>
+        /// 初始化类型的新实例。
+        /// </summary>
+        /// <param name="length">引发此异常的键的长度。</param>
         public CacheKeyTooLongException(int length)
             : base(BuildMessage(length))
         {
@@ -14,9 +18,7 @@ namespace cmstar.Caching
 
         private static string BuildMessage(int length)
         {
-            var msg = string.Format(
-                "The cache key (length {0}) is too long, the max length is {1}.",
-                length, CacheEnv.CacheKeyMaxLength);
+            var msg = $"The cache key (length {length}) is too long, the max length is {CacheEnv.CacheKeyMaxLength}.";
             return msg;
         }
     }
