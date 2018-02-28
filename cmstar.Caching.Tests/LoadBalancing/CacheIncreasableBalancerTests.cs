@@ -9,7 +9,7 @@ namespace cmstar.Caching.LoadBalancing
         {
             var cacheBalancer = new CacheIncreasableBalancer();
             cacheBalancer.AddNode(new MemoryCacheProvider("name"));
-            cacheBalancer.AddNode(HttpRuntimeCacheProvider.Instance);
+            cacheBalancer.AddNode(SimpleObjectCacheProvider.Instance);
 
             CacheProvider = cacheBalancer;
         }

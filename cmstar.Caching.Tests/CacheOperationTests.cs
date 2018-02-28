@@ -7,6 +7,8 @@ namespace cmstar.Caching
     [TestFixture]
     public class CacheOperationTests
     {
+        private static readonly MemoryCacheProvider CacheInstance = new MemoryCacheProvider(Environment.MachineName);
+
         [Test]
         public void TestIncreasableCache()
         {
@@ -46,11 +48,11 @@ namespace cmstar.Caching
             };
 
             Console.WriteLine("Testing synchronized cache...");
-            test(HttpRuntimeCacheProvider.Instance);
+            test(CacheInstance);
 
 #if !NET35
             Console.WriteLine("Testing asynchronized cache...");
-            test(new CacheIncreasableAdapter(HttpRuntimeCacheProvider.Instance));
+            test(new CacheIncreasableAdapter(CacheInstance));
 #endif
         }
 
@@ -90,11 +92,11 @@ namespace cmstar.Caching
             };
 
             Console.WriteLine("Testing synchronized cache...");
-            test(HttpRuntimeCacheProvider.Instance);
+            test(CacheInstance);
 
 #if !NET35
             Console.WriteLine("Testing asynchronized cache...");
-            test(new CacheFieldIncreasableAdapter(HttpRuntimeCacheProvider.Instance));
+            test(new CacheFieldIncreasableAdapter(CacheInstance));
 #endif
         }
 
@@ -137,11 +139,11 @@ namespace cmstar.Caching
             };
 
             Console.WriteLine("Testing synchronized cache...");
-            test(HttpRuntimeCacheProvider.Instance);
+            test(CacheInstance);
 
 #if !NET35
             Console.WriteLine("Testing asynchronized cache...");
-            test(new CacheIncreasableAdapter(HttpRuntimeCacheProvider.Instance));
+            test(new CacheIncreasableAdapter(CacheInstance));
 #endif
         }
 
@@ -181,11 +183,11 @@ namespace cmstar.Caching
             };
 
             Console.WriteLine("Testing synchronized cache...");
-            test(HttpRuntimeCacheProvider.Instance);
+            test(CacheInstance);
 
 #if !NET35
             Console.WriteLine("Testing asynchronized cache...");
-            test(new CacheFieldIncreasableAdapter(HttpRuntimeCacheProvider.Instance));
+            test(new CacheFieldIncreasableAdapter(CacheInstance));
 #endif
         }
 
@@ -222,11 +224,11 @@ namespace cmstar.Caching
             };
 
             Console.WriteLine("Testing synchronized cache...");
-            test(HttpRuntimeCacheProvider.Instance);
+            test(CacheInstance);
 
 #if !NET35
             Console.WriteLine("Testing asynchronized cache...");
-            test(new CacheFieldIncreasableAdapter(HttpRuntimeCacheProvider.Instance));
+            test(new CacheFieldIncreasableAdapter(CacheInstance));
 #endif
         }
 
