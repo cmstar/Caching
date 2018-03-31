@@ -23,11 +23,17 @@ namespace cmstar.Caching.Redis
             _databaseNumber = databaseNumber;
         }
 
+        /// <summary>
+        /// 获取或设置一个值，该值表示实例内的 *Async 方法是否使用异步执行。
+        /// 当值为<c>true</c>时，实例内的 *Async 方法使用异步执行；否则使用非异步方式执行。
+        /// 默认值为<c>true</c>。
+        /// </summary>
+        public bool AsyncEnabled { get; set; } = true;
+
         /// <inheritdoc cref="ICacheProvider.Get{T}" />
         public T Get<T>(string key)
         {
-            T value;
-            TryGet(key, out value);
+            TryGet(key, out T value);
             return value;
         }
 
@@ -100,6 +106,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.GetAsync{T}" />
         public async Task<T> GetAsync<T>(string key)
         {
+            if (!AsyncEnabled)
+                return Get<T>(key);
+
             var res = await TryGetAsync<T>(key);
             return res.Value;
         }
@@ -107,9 +116,11 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.TryGetAsync{T}" />
         public async Task<TryGetResult<T>> TryGetAsync<T>(string key)
         {
+            if (!AsyncEnabled)
+                return new TryGetResult<T>(TryGet<T>(key, out var result), result);
+
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = await db.StringGetAsync(key);
-
             var hasValue = !redisValue.IsNull;
             var value = hasValue
                 ? RedisConvert.FromRedisValue<T>(redisValue)
@@ -133,6 +144,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.RemoveAsync" />
         public Task<bool> RemoveAsync(string key)
         {
+            if (!AsyncEnabled)
+                return Task.FromResult(Remove(key));
+
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDeleteAsync(key);
         }
@@ -140,6 +154,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheIncreasable.IncreaseAsync{T}" />
         public async Task<T> IncreaseAsync<T>(string key, T increment)
         {
+            if (!AsyncEnabled)
+                return Increase(key, increment);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
 
@@ -161,6 +178,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreateAsync{T}" />
         public async Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration)
         {
+            if (!AsyncEnabled)
+                return IncreaseOrCreate(key, increment, expiration);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var res = await db.StringIncrementAsync(key, incrementLong);
@@ -184,6 +204,9 @@ namespace cmstar.Caching.Redis
 
         private Task<bool> InternalSetAsync<T>(string key, T value, TimeSpan expiration, When when)
         {
+            if (!AsyncEnabled)
+                return Task.FromResult(InternalSet(key, value, expiration, when));
+
             var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = RedisConvert.ToRedisValue(value);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using cmstar.Caching;
 using StackExchange.Redis;
 
 namespace cmstar.Caching.Redis
@@ -24,11 +23,17 @@ namespace cmstar.Caching.Redis
             _databaseNumber = databaseNumber;
         }
 
+        /// <summary>
+        /// 获取或设置一个值，该值表示实例内的 *Async 方法是否使用异步执行。
+        /// 当值为<c>true</c>时，实例内的 *Async 方法使用异步执行；否则使用非异步方式执行。
+        /// 默认值为<c>true</c>。
+        /// </summary>
+        public bool AsyncEnabled { get; set; } = true;
+
         /// <inheritdoc cref="ICacheProvider.Get{T}" />
         public T Get<T>(string key)
         {
-            T value;
-            TryGet(key, out value);
+            TryGet(key, out T value);
             return value;
         }
 
@@ -98,8 +103,7 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldAccessable.FieldGet{T,TField}" />
         public TField FieldGet<T, TField>(string key, string field)
         {
-            TField value;
-            FieldTryGet<T, TField>(key, field, out value);
+            FieldTryGet<T, TField>(key, field, out var value);
             return value;
         }
 
@@ -173,6 +177,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.GetAsync{T}" />
         public async Task<T> GetAsync<T>(string key)
         {
+            if (!AsyncEnabled)
+                return Get<T>(key);
+
             var res = await TryGetAsync<T>(key);
             return res.Value;
         }
@@ -180,6 +187,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.TryGetAsync{T}" />
         public async Task<TryGetResult<T>> TryGetAsync<T>(string key)
         {
+            if (!AsyncEnabled)
+                return new TryGetResult<T>(TryGet<T>(key, out var result), result);
+
             var db = _redis.GetDatabase(_databaseNumber);
             var hasValue = await db.KeyExistsAsync(key);
 
@@ -212,6 +222,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheProvider.RemoveAsync" />
         public Task<bool> RemoveAsync(string key)
         {
+            if (!AsyncEnabled)
+                return Task.FromResult(Remove(key));
+
             var db = _redis.GetDatabase(_databaseNumber);
             return db.KeyDeleteAsync(key);
         }
@@ -219,6 +232,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheIncreasable.IncreaseAsync{T}" />
         public async Task<T> IncreaseAsync<T>(string key, T increment)
         {
+            if (!AsyncEnabled)
+                return Increase(key, increment);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var tran = db.CreateTransaction();
@@ -239,6 +255,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreateAsync{T}" />
         public async Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration)
         {
+            if (!AsyncEnabled)
+                return IncreaseOrCreate(key, increment, expiration);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var res = await db.HashIncrementAsync(key, RedisConvert.EntryNameForSpecialValue, incrementLong);
@@ -255,6 +274,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldAccessable.FieldGetAsync{T,TField}"/>
         public async Task<TField> FieldGetAsync<T, TField>(string key, string field)
         {
+            if (!AsyncEnabled)
+                return FieldGet<T, TField>(key, field);
+
             var res = await FieldTryGetAsync<T, TField>(key, field);
             return res.Value;
         }
@@ -262,6 +284,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldAccessable.FieldTryGetAsync{T,TField}"/>
         public async Task<TryGetResult<TField>> FieldTryGetAsync<T, TField>(string key, string field)
         {
+            if (!AsyncEnabled)
+                return new TryGetResult<TField>(FieldTryGet<T, TField>(key, field, out var result), result);
+
             var db = _redis.GetDatabase(_databaseNumber);
             var redisValue = await db.HashGetAsync(key, field);
 
@@ -277,12 +302,17 @@ namespace cmstar.Caching.Redis
         public Task<bool> FieldSetAsync<T, TField>(string key, string field, TField value)
         {
             var tran = PrepareTransationForFieldSet(key, field, value);
-            return tran.ExecuteAsync();
+            return AsyncEnabled
+                ? tran.ExecuteAsync()
+                : Task.FromResult(tran.Execute());
         }
 
         /// <inheritdoc cref="ICacheFieldAccessable.FieldSetOrCreateAsync{T,TField}"/>
         public async Task<bool> FieldSetOrCreateAsync<T, TField>(string key, string field, TField value, TimeSpan expiration)
         {
+            if (!AsyncEnabled)
+                return FieldSetOrCreate<T, TField>(key, field, value, expiration);
+
             var redisValue = RedisConvert.ToRedisValue(value);
             var db = _redis.GetDatabase(_databaseNumber);
 
@@ -297,6 +327,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldIncreasable.FieldIncreaseAsync{T,TField}"/>
         public async Task<TField> FieldIncreaseAsync<T, TField>(string key, string field, TField increment)
         {
+            if (!AsyncEnabled)
+                return FieldIncrease<T, TField>(key, field, increment);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var tran = db.CreateTransaction();
@@ -314,6 +347,9 @@ namespace cmstar.Caching.Redis
         /// <inheritdoc cref="ICacheFieldIncreasable.FieldIncreaseOrCreateAsync{T,TField}"/>
         public async Task<TField> FieldIncreaseOrCreateAsync<T, TField>(string key, string field, TField increment, TimeSpan expiration)
         {
+            if (!AsyncEnabled)
+                return FieldIncreaseOrCreate<T, TField>(key, field, increment, expiration);
+
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
             var res = await db.HashIncrementAsync(key, field, incrementLong);
@@ -333,16 +369,17 @@ namespace cmstar.Caching.Redis
             return tran.Execute();
         }
 
-        private async Task<bool> CreateOrSetAsync<T>(string key, T value, TimeSpan expiration, bool create)
+        private Task<bool> CreateOrSetAsync<T>(string key, T value, TimeSpan expiration, bool create)
         {
             var tran = PrepareTransactionForCreateOrSet(key, value, expiration, create);
-            return await tran.ExecuteAsync();
+            return AsyncEnabled
+                ? tran.ExecuteAsync()
+                : Task.FromResult(tran.Execute());
         }
 
         private ITransaction PrepareTransactionForCreateOrSet<T>(string key, T value, TimeSpan expiration, bool create)
         {
-            bool shouldRemoveSpecialEntry;
-            var hashEntries = RedisConvert.ToHashEntries(value, out shouldRemoveSpecialEntry);
+            var hashEntries = RedisConvert.ToHashEntries(value, out var shouldRemoveSpecialEntry);
             var e = TimeSpan.Zero.Equals(expiration) ? (TimeSpan?)null : expiration;
             var db = _redis.GetDatabase(_databaseNumber);
             var tran = db.CreateTransaction();
