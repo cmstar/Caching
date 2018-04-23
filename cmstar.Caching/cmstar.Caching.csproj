@@ -53,6 +53,7 @@
     <Compile Include="EmptyCacheOperationObserver.cs" />
     <Compile Include="EmptyCacheProvider.cs" />
     <Compile Include="HttpRunTimeCacheProvider.cs" />
+    <Compile Include="HttpRuntimeCacheProviderSlim.cs" />
     <Compile Include="ICacheFieldAccessable.cs" />
     <Compile Include="ICacheFieldIncreasable.cs" />
     <Compile Include="ICacheIncreasable.cs" />
