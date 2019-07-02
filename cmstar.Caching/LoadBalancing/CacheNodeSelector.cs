@@ -63,7 +63,8 @@ namespace cmstar.Caching.LoadBalancing
             // 这里不用加锁。目前只能添加新节点，不能移除节点，如果刚好有新的节点被添加，
             // 这里使用“旧的”字段值做处理，会忽略刚刚添加的节点，并不会产生数据错乱。
 
-            var hash = Math.Abs(key.GetHashCode()) % _weightSummation;
+            var hash = GetStableHashCode(key);
+            var mod = Math.Abs(hash) % _weightSummation;
             var len = _nextNodeIndex;
             var nodes = _nodes;
 
@@ -71,7 +72,7 @@ namespace cmstar.Caching.LoadBalancing
             {
                 var node = nodes[i];
 
-                if (hash < node.WeightSummation)
+                if (mod < node.WeightSummation)
                     return node.Provider;
             }
 
@@ -112,6 +113,34 @@ namespace cmstar.Caching.LoadBalancing
                 _nextNodeIndex++;
                 _weightSummation = newWeightSummation;
             }
+        }
+
+        /// <summary>
+        /// 计算指定的字符串的哈希值。
+        /// 此算法计算结果相对稳定，当希望程序在不同的运行生命周期中总是获取到同一个哈希值时使用此方法。
+        /// </summary>
+        /// <param name="value">指定的字符串。</param>
+        /// <returns>哈希值。</returns>
+        /// <exception cref="ArgumentNullException">当<paramref name="value"/>为null。</exception>
+        /// <remarks>
+        /// 根据 .net 文档（ https://docs.microsoft.com/en-us/dotnet/api/system.string.gethashcode ），
+        /// <see cref="String.GetHashCode"/>方法返回的值在不同版本、平台、甚至一个程序的多次运行中是不稳定的，
+        /// 为了得到一个稳定的值，这里单独实现一个哈希算法，此算法取自 Java8 的 String.hashCode() 方法。
+        /// </remarks>
+        private static int GetStableHashCode(string value)
+        {
+            ArgAssert.NotNull(value, nameof(value));
+
+            // s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
+            var h = 0;
+            unchecked
+            {
+                for (int i = 0; i < value.Length; i++)
+                {
+                    h = 31 * h + value[i];
+                }
+            }
+            return h;
         }
 
         private struct CacheNode
