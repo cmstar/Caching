@@ -11,7 +11,7 @@ namespace cmstar.Caching
         /// 当前测试用例中，缓存总是使用这个key存储。
         /// </summary>
         protected const string Key = "TEST_12740E08F86E42A4A8B0638E653DCF3A";
-        
+
         /// <summary>
         /// 当前测试用例中使用的缓存超时。
         /// 耗时较短的版本，主要用于验证超时。
@@ -248,6 +248,12 @@ namespace cmstar.Caching
         public void TestOnEmptyStruct()
         {
             PerformTestCacheProvider(new CacheValueStruct());
+        }
+
+        [Test]
+        public void TestOnNullable()
+        {
+            PerformTestCacheProvider((CacheValueStruct?)null);
         }
 
         [Test]

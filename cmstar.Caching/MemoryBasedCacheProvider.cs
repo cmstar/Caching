@@ -42,9 +42,20 @@ namespace cmstar.Caching
                     return false;
                 }
 
-                value = v is T
-                    ? (T)v
-                    : (T)Convert.ChangeType(v, typeof(T));
+                switch (v)
+                {
+                    case null:
+                        value = default(T);
+                        break;
+
+                    case T directValue:
+                        value = directValue;
+                        break;
+
+                    default:
+                        value = (T)Convert.ChangeType(v, typeof(T));
+                        break;
+                }
 
                 return true;
             }
