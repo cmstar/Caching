@@ -28,6 +28,7 @@ namespace cmstar.Caching
         public int IntField;
         public short ShortField;
         public byte ByteField;
+        public int? NullableField;
         public DateTime DateTimeField;
         public IList<int> ArrayField;
         public CacheValueStruct StructField;
@@ -40,6 +41,7 @@ namespace cmstar.Caching
                 || other.IntField != IntField
                 || other.ShortField != ShortField
                 || other.ByteField != ByteField
+                || other.NullableField != NullableField
                 || other.DateTimeField != DateTimeField
                 || !other.StructField.Equals(StructField))
             {

@@ -81,10 +81,21 @@ namespace cmstar.Caching.Redis
             var tran = db.CreateTransaction();
             tran.AddCondition(Condition.KeyExists(key));
 
-            var res = tran.StringIncrementAsync(key, incrementLong);
-            return tran.Execute()
-                ? (T)Convert.ChangeType(res.Result, typeof(T))
-                : default(T);
+            try
+            {
+                var res = tran.StringIncrementAsync(key, incrementLong);
+                return tran.Execute()
+                    ? (T)Convert.ChangeType(res.Result, typeof(T))
+                    : default(T);
+            }
+            catch (Exception ex)
+            {
+                var convertedException = RedisConvert.TryConvertExceptionForNumberIncrementOnInvalidValue(ex);
+                if (convertedException != null)
+                    throw convertedException;
+
+                throw;
+            }
         }
 
         /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreate{T}" />
@@ -92,7 +103,20 @@ namespace cmstar.Caching.Redis
         {
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
-            var res = db.StringIncrement(key, incrementLong);
+
+            long res;
+            try
+            {
+                res = db.StringIncrement(key, incrementLong);
+            }
+            catch (Exception ex)
+            {
+                var convertedException = RedisConvert.TryConvertExceptionForNumberIncrementOnInvalidValue(ex);
+                if (convertedException != null)
+                    throw convertedException;
+
+                throw;
+            }
 
             // 如果值是新建的，需要设置其超时时间。
             if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))
@@ -163,16 +187,26 @@ namespace cmstar.Caching.Redis
             var tran = db.CreateTransaction();
             tran.AddCondition(Condition.KeyExists(key));
 
-            var incrTask = tran.StringIncrementAsync(key, incrementLong);
-            var tranSucc = await tran.ExecuteAsync();
+            try
+            {
+                var incrTask = tran.StringIncrementAsync(key, incrementLong);
+                var tranSucc = await tran.ExecuteAsync();
+                if (!tranSucc)
+                    return default(T);
 
-            if (!tranSucc)
-                return default(T);
+                // 根据SE.Redis的文档，await ExecuteAsync 之后，事务内的操作肯定都完成了，
+                // 所以这里其实是可以访问 incrTask.Result 的。但我们应当尽量避免在 async
+                // 代码内这样做，所以这里仍然 await 之。
+                return (T)Convert.ChangeType(await incrTask, typeof(T));
+            }
+            catch (Exception ex)
+            {
+                var convertedException = RedisConvert.TryConvertExceptionForNumberIncrementOnInvalidValue(ex);
+                if (convertedException != null)
+                    throw convertedException;
 
-            // 根据SE.Redis的文档，await ExecuteAsync 之后，事务内的操作肯定都完成了，
-            // 所以这里其实是可以访问 incrTask.Result 的。但我们应当尽量避免在 async
-            // 代码内这样做，所以这里仍然 await 之。
-            return (T)Convert.ChangeType(await incrTask, typeof(T));
+                throw;
+            }
         }
 
         /// <inheritdoc cref="ICacheIncreasable.IncreaseOrCreateAsync{T}" />
@@ -183,7 +217,20 @@ namespace cmstar.Caching.Redis
 
             var incrementLong = Convert.ToInt64(increment);
             var db = _redis.GetDatabase(_databaseNumber);
-            var res = await db.StringIncrementAsync(key, incrementLong);
+
+            long res;
+            try
+            {
+                res = await db.StringIncrementAsync(key, incrementLong);
+            }
+            catch (Exception ex)
+            {
+                var convertedException = RedisConvert.TryConvertExceptionForNumberIncrementOnInvalidValue(ex);
+                if (convertedException != null)
+                    throw convertedException;
+
+                throw;
+            }
 
             // 如果值是新建的，需要设置其超时时间。
             if (!TimeSpan.Zero.Equals(expiration) && RedisConvert.IsNewlyCreatedAfterIncreasing(res, incrementLong))

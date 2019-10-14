@@ -143,6 +143,13 @@ namespace cmstar.Caching
             ActionAndAssert<byte>(increase, 0, 39);
         }
 
+        [Test]
+        public void TestOnNull()
+        {
+            CacheProvider.Set<int?>(Key, null, TimeSpan.FromHours(1));
+            Assert.Throws<InvalidCastException>(() => CacheProvider.Increase<byte>(Key, 1));
+        }
+
         private void AssertCacheNotExist()
         {
             // 在一些缓存实现中（比如.net的MemoryCache和HttpRuntimeCache），缓存有两种过期方式，
@@ -161,7 +168,6 @@ namespace cmstar.Caching
             Assert.NotNull(cachedValue);
             Assert.AreEqual(expected, cachedValue);
         }
-
 
         private void ActionAndAssert<T>(Func<T, T> funcIncr, T increment, T expected)
         {

@@ -101,7 +101,9 @@ namespace cmstar.Caching
                 if (!InternalTryGetRaw(key, out cacheValue))
                     return default(T);
 
-                var result = Adding.AddIntegers(cacheValue.Value, increment);
+                var result = Adding.AddIntegers(cacheValue?.Value, increment);
+
+                // ReSharper disable once PossibleNullReferenceException
                 cacheValue.Value = result.Value;
 
                 return result.IsIncrementType

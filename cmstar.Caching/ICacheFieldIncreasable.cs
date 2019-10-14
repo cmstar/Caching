@@ -21,6 +21,7 @@ namespace cmstar.Caching
         /// 若对已存在的缓存对象的对应字段进行了设值，返回增加后的字段值；
         /// 否则返回<typeparamref name="TField"/>的默认值。
         /// </returns>
+        /// <exception cref="InvalidCastException">缓存存在，但字段值为null。</exception>
         TField FieldIncrease<T, TField>(string key, string field, TField increment);
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>返回增加（缓存不存在时为新建）后的字段值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但字段值为null。</exception>
         TField FieldIncreaseOrCreate<T, TField>(string key, string field, TField increment, TimeSpan expiration);
 
         /// <summary>
@@ -53,6 +55,7 @@ namespace cmstar.Caching
         /// 若对已存在的缓存对象的对应字段进行了设值，返回增加后的字段值；
         /// 否则返回<typeparamref name="TField"/>的默认值。
         /// </returns>
+        /// <exception cref="InvalidCastException">缓存存在，但字段值为null。</exception>
         Task<TField> FieldIncreaseAsync<T, TField>(string key, string field, TField increment);
 
         /// <summary>
@@ -70,6 +73,7 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>返回增加（缓存不存在时为新建）后的字段值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但字段值为null。</exception>
         Task<TField> FieldIncreaseOrCreateAsync<T, TField>(string key, string field, TField increment, TimeSpan expiration);
     }
 }

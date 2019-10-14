@@ -12,7 +12,8 @@ namespace cmstar.Caching
         /// </summary>
         /// <param name="target">被加数。</param>
         /// <param name="increment">加数。</param>
-        /// <returns></returns>
+        /// <returns>相加后的结果。</returns>
+        /// <exception cref="InvalidCastException">当<paramref name="target"/>为null。</exception>
         public static AddingResult AddIntegers(object target, object increment)
         {
             if (target == null || increment == null)

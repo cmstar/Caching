@@ -16,6 +16,7 @@ namespace cmstar.Caching
         /// <param name="key">缓存的键。</param>
         /// <param name="increment">增量，必须是整数，或能够转换为整数。使用负数来做减法。</param>
         /// <returns>指定键的缓存存在时，返回增加后的值；否则返回<typeparamref name="T"/>的默认值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但是值为null。</exception>
         T Increase<T>(string key, T increment);
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>返回增加（缓存不存在时为新建）后的值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但是值为null。</exception>
         T IncreaseOrCreate<T>(string key, T increment, TimeSpan expiration);
 
         /// <summary>
@@ -41,6 +43,7 @@ namespace cmstar.Caching
         /// <param name="key">缓存的键。</param>
         /// <param name="increment">增量，必须是整数，或能够转换为整数。使用负数来做减法。</param>
         /// <returns>指定键的缓存存在时，返回增加后的值；否则返回<typeparamref name="T"/>的默认值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但是值为null。</exception>
         Task<T> IncreaseAsync<T>(string key, T increment);
 
         /// <summary>
@@ -56,6 +59,7 @@ namespace cmstar.Caching
         /// 指定被创建的缓存对象的过期时间。使用<see cref="TimeSpan.Zero"/>表示缓存不会过期。
         /// </param>
         /// <returns>返回增加（缓存不存在时为新建）后的值。</returns>
+        /// <exception cref="InvalidCastException">缓存存在，但是值为null。</exception>
         Task<T> IncreaseOrCreateAsync<T>(string key, T increment, TimeSpan expiration);
     }
 }

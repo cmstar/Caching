@@ -426,6 +426,31 @@ namespace cmstar.Caching.Redis
             return result == increment;
         }
 
+        /// <summary>
+        /// 若异常表示在redis上对一个无效的值进行了加减（INCR）操作，返回<see cref="InvalidCastException"/>，
+        /// 并以给定的异常作为内部异常；否则返回null。
+        /// </summary>
+        public static Exception TryConvertExceptionForNumberIncrementOnInvalidValue(Exception raw)
+        {
+            // 对无效值进行 INCR 操作时，会得到redis服务返回的错误，总是以 RedisServerException 表示的，
+            // redis没有定义具体的错误码，只能通过错误消息的内容来判断，此错误的消息为：
+            // “value is not an integer or out of range”或“hash value is not an integer”
+            const string redisServerExceptionMessageTrait = "not an integer";
+
+            if (raw is AggregateException aggEx)
+            {
+                raw = aggEx.InnerExceptions[0];
+            }
+
+            if (!(raw is RedisServerException redisServerException))
+                return raw;
+
+            if (!redisServerException.Message.Contains(redisServerExceptionMessageTrait))
+                return raw;
+
+            return new InvalidCastException("The value is not an integer or out of range.", raw);
+        }
+
         private static byte[] ConvertToBinary(RedisValue value)
         {
             if (!value.HasValue)

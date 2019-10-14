@@ -213,6 +213,13 @@ namespace cmstar.Caching
             ActionAndAssert(increase, fieldSelector, 0, -20980);
         }
 
+        [Test]
+        public void TestOnNull()
+        {
+            CacheProvider.Create(Key, new CacheValueClass(), ExpiryLong);
+            Assert.Throws<InvalidCastException>(() => CacheProvider.FieldIncrease<CacheValueClass, int>(Key, "NullableField", 1));
+        }
+
         private void AssertCacheNotExist()
         {
             // 在一些缓存实现中（比如.net的MemoryCache和HttpRuntimeCache），缓存有两种过期方式，
