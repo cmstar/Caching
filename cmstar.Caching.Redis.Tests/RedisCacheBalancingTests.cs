@@ -14,7 +14,7 @@ namespace cmstar.Caching.Redis
                 var cache1 = new RedisCacheProvider(RedisTestEnv.GetRedisServerConfiguration());
                 var cache2 = new RedisCacheProvider(RedisTestEnv.GetRedisServerConfiguration2());
                 var cache3 = new RedisHashCacheProvider(RedisTestEnv.GetRedisServerConfiguration3());
-                var cache4 = HttpRuntimeCacheProvider.Instance;
+                var cache4 = new MemoryCacheProvider(nameof(RedisCacheBalancingTests));
 
                 var cacheBalancer = new CacheBalancer();
                 cacheBalancer.AddNode(cache1);

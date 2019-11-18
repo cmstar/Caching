@@ -1,12 +1,11 @@
 ﻿using NUnit.Framework;
-using cmstar.Caching;
 
 namespace cmstar.Caching.Redis
 {
     [TestFixture]
     public class L2RedisCacheProviderTests
     {
-        private static readonly ICacheProvider L1Cache = HttpRuntimeCacheProvider.Instance;
+        private static readonly ICacheProvider L1Cache = new MemoryCacheProvider(nameof(L2RedisCacheProviderTests));
         private static readonly ICacheProvider L2Cache = new RedisCacheProvider(RedisTestEnv.GetRedisServerConfiguration());
 
         // L1的超时，需要足够的短，以便验证缓存超时。

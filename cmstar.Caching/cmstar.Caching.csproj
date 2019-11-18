@@ -1,90 +1,49 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{66A17AD3-9983-4B29-8DB3-44218DB9ED58}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <!--Build options-->
+    <TargetFrameworks>net46;netstandard2.0;</TargetFrameworks>
     <RootNamespace>cmstar.Caching</RootNamespace>
     <AssemblyName>cmstar.Caching</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591;1701;1702;3021</NoWarn>
+
+    <!--Package info-->
+    <Authors>Eric Ruan</Authors>
+    <Description>A simple cache library.</Description>
+    <Copyright>Copyright © Eric Ruan 2015</Copyright>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <!--Compiling contants-->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DefineConstants>TRACE;</DefineConstants>
+    <DocumentationFile />
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETSTANDARD;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <!--net46-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Adding.cs" />
-    <Compile Include="AddingResult.cs" />
-    <Compile Include="ArgAssert.cs" />
-    <Compile Include="CacheEnv.cs" />
-    <Compile Include="CacheExpiration.cs" />
-    <Compile Include="CacheKeyTooLongException.cs" />
-    <Compile Include="CacheOperation.cs" />
-    <Compile Include="CacheOperationBase.cs" />
-    <Compile Include="CacheUtils.cs" />
-    <Compile Include="CacheValue.cs" />
-    <Compile Include="EmptyCacheOperationObserver.cs" />
-    <Compile Include="EmptyCacheProvider.cs" />
-    <Compile Include="HttpRunTimeCacheProvider.cs" />
-    <Compile Include="HttpRuntimeCacheProviderSlim.cs" />
-    <Compile Include="ICacheFieldAccessable.cs" />
-    <Compile Include="ICacheFieldIncreasable.cs" />
-    <Compile Include="ICacheIncreasable.cs" />
-    <Compile Include="ICacheOperationObserver.cs" />
-    <Compile Include="ICacheProvider.cs" />
-    <Compile Include="KeyOperation.cs" />
-    <Compile Include="KeyOperation_Async.cs" />
-    <Compile Include="L2CacheProvider.cs" />
-    <Compile Include="L2CacheProvider_Async.cs" />
-    <Compile Include="LoadBalancing\CacheBalancer.cs" />
-    <Compile Include="LoadBalancing\CacheFieldAccessableBalancer.cs" />
-    <Compile Include="LoadBalancing\CacheFieldIncreasableBalancer.cs" />
-    <Compile Include="LoadBalancing\CacheIncreasableBalancer.cs" />
-    <Compile Include="LoadBalancing\CacheNodeSelector.cs" />
-    <Compile Include="MemoryBasedCacheProvider.cs" />
-    <Compile Include="MemoryBasedCacheProvider_Async.cs" />
-    <Compile Include="MemoryCacheProvider.cs" />
-    <Compile Include="MemoryCacheProviderSlim.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reflection\Emit\ConstructorInvokerGenerator.cs" />
-    <Compile Include="Reflection\Emit\DelegateCache.cs" />
-    <Compile Include="Reflection\Emit\EmitUtils.cs" />
-    <Compile Include="Reflection\Emit\FieldAccessorGenerator.cs" />
-    <Compile Include="Reflection\Emit\MethodInvokerGenerator.cs" />
-    <Compile Include="Reflection\Emit\OpCodeExtention.cs" />
-    <Compile Include="Reflection\Emit\PropertyAccessorGenerator.cs" />
-    <Compile Include="Reflection\ReflectionUtils.cs" />
-    <Compile Include="Reflection\TypeMemberAccessorUtils.cs" />
-    <Compile Include="Reflection\TypeMemberIndentity.cs" />
-    <Compile Include="SpinKeyLock.cs" />
-    <Compile Include="TryGetResult.cs" />
+
+  <!--netstandard2.0-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+
+    <Compile Remove="HttpRuntimeCacheProvider.cs" />
+    <Compile Remove="HttpRuntimeCacheProviderSlim.cs" />
+    <Compile Remove="MemoryCacheProvider.cs" />
+    <Compile Remove="MemoryCacheProviderSlim.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

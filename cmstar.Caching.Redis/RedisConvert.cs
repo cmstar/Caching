@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using cmstar.Caching.Reflection;
@@ -106,6 +105,10 @@ namespace cmstar.Caching.Redis
                 return ReflectionUtils.GetDefaultValue(type);
             }
 
+            // 对于 Nullable<> ，只需要处理器内在类型。
+            // 如果值为 null ，会存储在 EntryNameForSpecialValue 域并直接结束处理过程。
+            type = ReflectionUtils.GetUnderlyingType(type);
+
             using (var itor = entries.GetEnumerator())
             {
                 if (!itor.MoveNext())
@@ -176,45 +179,61 @@ namespace cmstar.Caching.Redis
         /// <returns>转换后的值，类型为<paramref name="type"/>。</returns>
         public static object FromRedisValue(RedisValue redisValue, Type type)
         {
-            var typeCode = Type.GetTypeCode(type);
+            string stringValue = null;
+
+            // null to Nullable<>
+            if (ReflectionUtils.IsNullableType(type))
+            {
+                stringValue = redisValue;
+                if (CacheEnv.NullValueString.Equals(stringValue))
+                    return ReflectionUtils.GetDefaultValue(type);
+            }
+
+            var underlyingType = ReflectionUtils.GetUnderlyingType(type);
+            var typeCode = Type.GetTypeCode(underlyingType);
             switch (typeCode)
             {
                 case TypeCode.String:
-                    var v = (string)redisValue;
-                    return v == CacheEnv.NullValueString ? null : v;
+                    stringValue = stringValue ?? redisValue;
+                    return stringValue == CacheEnv.NullValueString ? null : stringValue;
 
                 case TypeCode.Boolean:
                     return (bool)redisValue;
 
+                // char 的处理需要和 ToRedisValue 方法一致，它和 RedisValue 内部定义的不一致。
                 case TypeCode.Char:
-                    return (char)redisValue;
+                    stringValue = stringValue ?? redisValue;
 
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    return stringValue == CacheEnv.NullValueString || stringValue == null ? '\0' : stringValue[0];
+
+                // 转换过程需和 ToRedisValue 方法匹配，故没有直接使用 IConvertible.ToXX 方法。
                 case TypeCode.SByte:
-                    return (sbyte)redisValue;
+                    return (sbyte)(int)redisValue;
 
                 case TypeCode.Byte:
-                    return (byte)redisValue;
+                    return (byte)(int)redisValue;
 
                 case TypeCode.Int16:
-                    return (short)redisValue;
+                    return (short)(int)redisValue;
 
                 case TypeCode.UInt16:
-                    return (ushort)redisValue;
+                    return (ushort)(int)redisValue;
 
                 case TypeCode.Int32:
                     return (int)redisValue;
 
                 case TypeCode.UInt32:
-                    return (uint)redisValue;
+                    return (uint)(long)redisValue;
 
                 case TypeCode.Int64:
-                    return long.Parse(redisValue);
+                    return (long)redisValue;
 
                 case TypeCode.UInt64:
                     return ulong.Parse(redisValue);
 
                 case TypeCode.Single:
-                    return float.Parse(redisValue);
+                    return (float)(double)redisValue;
 
                 case TypeCode.Double:
                     return (double)redisValue;
@@ -223,24 +242,24 @@ namespace cmstar.Caching.Redis
                     return decimal.Parse(redisValue);
 
                 case TypeCode.DateTime:
-                    return new DateTime(long.Parse(redisValue));
+                    return new DateTime((long)redisValue);
 
                 case TypeCode.DBNull:
                     return DBNull.Value;
             }
 
-            if (type == typeof(DateTimeOffset))
+            if (underlyingType == typeof(DateTimeOffset))
                 return StringToDateTimeOffset(redisValue);
 
-            if (type == typeof(Guid))
+            if (underlyingType == typeof(Guid))
                 return new Guid((string)redisValue);
 
-            if (type == typeof(byte[]))
+            if (underlyingType == typeof(byte[]))
                 return ConvertToBinary(redisValue);
 
-            var stringValue = (string)redisValue;
+            stringValue = stringValue ?? redisValue;
             if (CacheEnv.NullValueString.Equals(stringValue))
-                return ReflectionUtils.GetDefaultValue(type);
+                return ReflectionUtils.GetDefaultValue(underlyingType);
 
             // objects
             return JsonSerializer.Default.Deserialize(stringValue, type);
@@ -261,7 +280,9 @@ namespace cmstar.Caching.Redis
              * 然而redis数值是有符号的64位，不能表示ulong和decimal中超出其可存储范围的部分，
              * 对于这部分类型，直接ToString处理，避免RedisValue将其作为数值处理从而导致值溢出或精度损失
              */
-            var type = value.GetType();
+
+            // null 在上面处理掉了，这里对于 Nullable<> 直接处理其内部类型即可。
+            var type = ReflectionUtils.GetUnderlyingType(value.GetType());
             var typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
@@ -271,40 +292,42 @@ namespace cmstar.Caching.Redis
                 case TypeCode.Boolean:
                     return (bool)value;
 
+                // RedisValue 没有公开创建自 char 的方法，从其内部的 ToChar 方法可知道是作为 uint 处理的，
+                // 如果直接转为 uint 则使用的是 .net 内码 UTF-16，这和 string 的存储字符集 UTF-8 不一致。
+                // 这种不一致性导致存储的 char 被作为 string 读取出来时变成一段数字而不是一个字符，这很难受。
+                // char 应当和 string 有更好的兼容性，既然 RedisValue 没有直接定义怎么从 char 创建值，
+                // 这里就以 string 的兼容性为优先，将其作为字符串存储。
                 case TypeCode.Char:
-                    return (char)value;
+                    return value.ToString();
 
+                // RedisValue 没有定义如 sbyte 和 byte 的转换运算符，且在不同版本有不同的实现，比如2.x版多了
+                // float 转换运算符，1.x版则没有。这里将这些（可能）支持得不太好的类型都转成更长的、受支持的
+                // 类型以避免这些兼容性问题，在各版本均被良好支持的数值类型有： int long double 。
                 case TypeCode.SByte:
-                    return (sbyte)value;
-
                 case TypeCode.Byte:
-                    return (byte)value;
-
                 case TypeCode.Int16:
-                    return (short)value;
-
                 case TypeCode.UInt16:
-                    return (ushort)value;
+                    return Convert.ToInt32(value);
 
                 case TypeCode.Int32:
                     return (int)value;
 
                 case TypeCode.UInt32:
-                    break;
+                    return Convert.ToInt64(value);
+
                 case TypeCode.Int64:
                     return (long)value;
 
-                case TypeCode.UInt64:
-                    return ((ulong)value).ToString(CultureInfo.InvariantCulture);
-
                 case TypeCode.Single:
-                    return (float)value;
+                    return Convert.ToDouble(value);
 
                 case TypeCode.Double:
                     return (double)value;
 
+                // decimal 未被直接支持，其可能超过 ulong 的最大值，直接以字符串形式处理。
+                case TypeCode.UInt64:
                 case TypeCode.Decimal:
-                    return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+                    return value.ToString();
 
                 case TypeCode.DateTime:
                     return ((DateTime)value).Ticks;
@@ -335,6 +358,9 @@ namespace cmstar.Caching.Redis
         /// <returns>给定Redis上存储的方式。</returns>
         public static RedisDataType GetDataType(Type type)
         {
+            if (ReflectionUtils.IsNullableType(type))
+                return RedisDataType.Nullable;
+
             var typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
@@ -407,7 +433,20 @@ namespace cmstar.Caching.Redis
         public static bool IsSimpleType(Type type)
         {
             var dataType = GetDataType(type);
-            return dataType != RedisDataType.Object;
+
+            switch (dataType)
+            {
+                case RedisDataType.Object:
+                    return false;
+
+                case RedisDataType.Nullable:
+                    var underlyingType = ReflectionUtils.GetUnderlyingType(type);
+                    dataType = GetDataType(underlyingType);
+                    return dataType != RedisDataType.Object;
+
+                default:
+                    return true;
+            }
         }
 
         /// <summary>

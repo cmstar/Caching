@@ -6,7 +6,7 @@ namespace cmstar.Caching
     [TestFixture]
     public class L2CacheProviderTests
     {
-        private static readonly ICacheProvider L1Cache = HttpRuntimeCacheProvider.Instance;
+        private static readonly ICacheProvider L1Cache = SimpleObjectCacheProvider.Instance;
         private static readonly ICacheProvider L2Cache = new MemoryCacheProvider("test");
 
         // L1的超时，需要足够的短，以便验证缓存超时。

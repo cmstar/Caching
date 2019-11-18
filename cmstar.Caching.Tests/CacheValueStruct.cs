@@ -46,8 +46,8 @@ namespace cmstar.Caching
         /// 转回来），同一个数在过程前后可能会有微小的误差。为了比较他们，我们可以认为，两个
         /// 数在一定的精度下相等则他们就是相等的。根据资料，<seealso cref="double"/>可以维持
         /// e+15的精度，所以我们判定两个数在此精度下相等即可。
+        /// ref http://stackoverflow.com/questions/2411392/double-epsilon-for-equality-greater-than-less-than-less-than-or-equal-to-gre
         /// </remarks>
-        /// <seealso cref="http://stackoverflow.com/questions/2411392/double-epsilon-for-equality-greater-than-less-than-less-than-or-equal-to-gre"/>
         private static bool AboutEquals(double x, double y)
         {
             var epsilon = Math.Max(Math.Abs(x), Math.Abs(y)) * 1e-15;

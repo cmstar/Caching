@@ -1044,83 +1044,93 @@
             the <see cref="P:cmstar.Serialization.IndentedTextWriter.IndentLevel"/> property.
             </summary>
         </member>
+        <member name="T:cmstar.Serialization.IndentedTextWriter">
+            <summary>
+            Provides a text writer that can indent new lines.
+            </summary>
+        </member>
+        <member name="F:cmstar.Serialization.IndentedTextWriter.MaxIndentLevel">
+            <summary>
+            The max indent level allowed in the <see cref="T:cmstar.Serialization.IndentedTextWriter"/>.
+            </summary>
+        </member>
+        <member name="F:cmstar.Serialization.IndentedTextWriter.DefaultIndentMark">
+            <summary>
+            The default string for indentations.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.IndentedTextWriter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:cmstar.Serialization.IndentedTextWriter"/> 
+            using the specified text writer and default indent mark.
+            </summary>
+            <param name="textWriter">The <see cref="T:System.IO.TextWriter"/> for output.</param>
+        </member>
+        <member name="M:cmstar.Serialization.IndentedTextWriter.#ctor(System.IO.TextWriter,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:cmstar.Serialization.IndentedTextWriter"/> 
+            using the specified text writer and indent mark.
+            </summary>
+            <param name="textWriter">The <see cref="T:System.IO.TextWriter"/> for output.</param>
+            <param name="indentMark">The indent mark used for indentations.</param>
+        </member>
+        <member name="P:cmstar.Serialization.IndentedTextWriter.IndentMark">
+            <summary>
+            Gets the string used for indentations in the <see cref="T:cmstar.Serialization.IndentedTextWriter"/>。
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.IndentedTextWriter.IndentLevel">
+            <summary>
+            Gets the indent level.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.IndentedTextWriter.IndentIncrease">
+            <summary>
+            Increases the indent level by 1.
+            The indent level will not change if already reached the <see cref="F:cmstar.Serialization.IndentedTextWriter.MaxIndentLevel"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.IndentedTextWriter.IndentDecrease">
+            <summary>
+            Decreases the indent level by 1.
+            The indent level will not change if it is zero.
+            </summary>
+        </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.ArrayContract">
+            <summary>
+            The contract for collections.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.ArrayContract.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.ArrayContract"/>
+            with the type of the colletion.
+            </summary>
+            <param name="type">The type of the colletion.</param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.Contracts.ArrayContract.ElementContract">
+            <summary>
+            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> used by the type of elements in the array.
+            If it is set to null, the contract will be resolved while elements are being written
+            to the JSON.
+            If <see cref="P:cmstar.Serialization.Json.Contracts.ArrayContract.ElementContract"/> is not set up, a non-empty JSON array cannot be 
+            deserialized and the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method will throw an exception.
+            </summary>
+        </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.BooleanContract">
+            <summary>
+            The contract for booleans.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.BooleanContract.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.BooleanContract"/>.
+            </summary>
+        </member>
         <member name="T:cmstar.Serialization.Json.Contracts.ContractMemberCollection">
             <summary>
             A key-value map which takes the property names as the keys and instances of
             the <see cref="T:cmstar.Serialization.Json.Contracts.ContractMemberInfo"/> as the values.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.DataRecordContract">
-            <summary>
-            The contract for <see cref="T:System.Data.IDataRecord"/>.
-            Serialize IDataRecords like POCOs.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.DataRowContract">
-            <summary>
-            The contract for <see cref="T:System.Data.DataRow"/>.
-            Serialize DataRows like POCOs.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.DataTableContract">
-            <summary>
-            The contract for <see cref="T:System.Data.DataTable"/>.
-            Treat the whole table as a colleciton of <see cref="T:System.Data.DataRow"/>s,
-            and each <see cref="T:System.Data.DataRow"/> as a POCO.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.DbNullContract">
-            <summary>
-            The contract for <see cref="T:System.DBNull"/>.
-            The <see cref="F:System.DBNull.Value"/> is serialized to JSON null.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.DictionaryContract">
-            <summary>
-            The contract for dictonaries.
-            It maps the key-value pairs in the dictionary to JSON properties.
-            </summary>
-        </member>
-        <member name="F:cmstar.Serialization.Json.Contracts.DictionaryContract.GenericDictionaryTypeDefinition">
-            <summary>
-            The type definition for generic dictionries.
-            </summary>
-        </member>
-        <member name="F:cmstar.Serialization.Json.Contracts.DictionaryContract.DictionaryTypeDefinition">
-            <summary>
-            The type definition for non-generic dictionries.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.DictionaryContract.#ctor(System.Type)">
-            <summary>
-            Initializes an new instance of <see cref="T:cmstar.Serialization.Json.Contracts.DictionaryContract"/>
-            with the given underlying type.
-            </summary>
-            <param name="type">The underlying type.</param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.Contracts.DictionaryContract.ValueContract">
-            <summary>
-            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the values in the dictionary.
-            If the property is null, the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method would throw an exception.
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.Json.Contracts.DictionaryContract.KeyConverter">
-            <summary>
-            Gets or sets the <see cref="T:System.ComponentModel.TypeConverter"/> for the keys in the dictionary.
-            The converter is used to convert the key objects to/from strings in the
-            JSON property names.
-            If the property is null, the <see cref="T:cmstar.Serialization.Json.Contracts.DictionaryContract"/> will try to use 
-            the default converter.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.GuidContract">
-            <summary>
-            The contract for <see cref="T:System.Guid"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.GuidContract.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.GuidContract"/>.
             </summary>
         </member>
         <member name="T:cmstar.Serialization.Json.Contracts.ContractMemberInfo">
@@ -1188,51 +1198,23 @@
             method during the serializing.
             </summary>
         </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.EnumContract">
+        <member name="T:cmstar.Serialization.Json.Contracts.DataRecordContract">
             <summary>
-            The contract for enumerations.
+            The contract for <see cref="T:System.Data.IDataRecord"/>.
+            Serialize IDataRecords like POCOs.
             </summary>
         </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.EnumContract.#ctor(System.Type)">
+        <member name="T:cmstar.Serialization.Json.Contracts.DataRowContract">
             <summary>
-            Initialize a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.EnumContract"/>.
-            </summary>
-            <param name="type">The type of the enum.</param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.Contracts.EnumContract.UseEnumName">
-            <summary>
-            Gets or sets a value, which specify whether to serializing a Enum by using it's name.
-            If it is set to true, a Enum will be serialized to a JSON string with it's name;
-            otherwise, will be serialized to a number with the index.
-            The default value is false.
+            The contract for <see cref="T:System.Data.DataRow"/>.
+            Serialize DataRows like POCOs.
             </summary>
         </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.NullableTypeContract">
+        <member name="T:cmstar.Serialization.Json.Contracts.DataTableContract">
             <summary>
-            The contract for <see cref="T:System.Nullable`1"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.NullableTypeContract.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.NullableTypeContract"/>
-            with the given underlying type.
-            </summary>
-            <param name="type">The underlying type.</param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.Contracts.NullableTypeContract.UnderlyingTypeContract">
-            <summary>
-            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for 
-            the underlying type of <see cref="T:System.Nullable`1"/>.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.BooleanContract">
-            <summary>
-            The contract for booleans.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.BooleanContract.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.BooleanContract"/>.
+            The contract for <see cref="T:System.Data.DataTable"/>.
+            Treat the whole table as a colleciton of <see cref="T:System.Data.DataRow"/>s,
+            and each <see cref="T:System.Data.DataRow"/> as a POCO.
             </summary>
         </member>
         <member name="T:cmstar.Serialization.Json.Contracts.DateTimeContract">
@@ -1263,30 +1245,95 @@
             <param name="dateTime">The <see cref="T:System.DateTime"/>.</param>
             <returns>The string value represents the <see cref="T:System.DateTime"/>.</returns>
         </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.ArrayContract">
+        <member name="T:cmstar.Serialization.Json.Contracts.DbNullContract">
             <summary>
-            The contract for collections.
+            The contract for <see cref="T:System.DBNull"/>.
+            The <see cref="F:System.DBNull.Value"/> is serialized to JSON null.
             </summary>
         </member>
-        <member name="M:cmstar.Serialization.Json.Contracts.ArrayContract.#ctor(System.Type)">
+        <member name="T:cmstar.Serialization.Json.Contracts.DictionaryContract">
             <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.ArrayContract"/>
-            with the type of the colletion.
-            </summary>
-            <param name="type">The type of the colletion.</param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.Contracts.ArrayContract.ElementContract">
-            <summary>
-            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> used by the type of elements in the array.
-            If it is set to null, the contract will be resolved while elements are being written
-            to the JSON.
-            If <see cref="P:cmstar.Serialization.Json.Contracts.ArrayContract.ElementContract"/> is not set up, a non-empty JSON array cannot be 
-            deserialized and the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method will throw an exception.
+            The contract for dictonaries.
+            It maps the key-value pairs in the dictionary to JSON properties.
             </summary>
         </member>
-        <member name="T:cmstar.Serialization.Json.Contracts.StringContract">
+        <member name="F:cmstar.Serialization.Json.Contracts.DictionaryContract.GenericDictionaryTypeDefinition">
             <summary>
-            The contract for strings.
+            The type definition for generic dictionries.
+            </summary>
+        </member>
+        <member name="F:cmstar.Serialization.Json.Contracts.DictionaryContract.DictionaryTypeDefinition">
+            <summary>
+            The type definition for non-generic dictionries.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.DictionaryContract.#ctor(System.Type)">
+            <summary>
+            Initializes an new instance of <see cref="T:cmstar.Serialization.Json.Contracts.DictionaryContract"/>
+            with the given underlying type.
+            </summary>
+            <param name="type">The underlying type.</param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.Contracts.DictionaryContract.ValueContract">
+            <summary>
+            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the values in the dictionary.
+            If the property is null, the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method would throw an exception.
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.Json.Contracts.DictionaryContract.KeyConverter">
+            <summary>
+            Gets or sets the <see cref="T:System.ComponentModel.TypeConverter"/> for the keys in the dictionary.
+            The converter is used to convert the key objects to/from strings in the
+            JSON property names.
+            If the property is null, the <see cref="T:cmstar.Serialization.Json.Contracts.DictionaryContract"/> will try to use 
+            the default converter.
+            </summary>
+        </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.EnumContract">
+            <summary>
+            The contract for enumerations.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.EnumContract.#ctor(System.Type)">
+            <summary>
+            Initialize a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.EnumContract"/>.
+            </summary>
+            <param name="type">The type of the enum.</param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.Contracts.EnumContract.UseEnumName">
+            <summary>
+            Gets or sets a value, which specify whether to serializing a Enum by using it's name.
+            If it is set to true, a Enum will be serialized to a JSON string with it's name;
+            otherwise, will be serialized to a number with the index.
+            The default value is false.
+            </summary>
+        </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.GuidContract">
+            <summary>
+            The contract for <see cref="T:System.Guid"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.GuidContract.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.GuidContract"/>.
+            </summary>
+        </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.NullableTypeContract">
+            <summary>
+            The contract for <see cref="T:System.Nullable`1"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.NullableTypeContract.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.NullableTypeContract"/>
+            with the given underlying type.
+            </summary>
+            <param name="type">The underlying type.</param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.Contracts.NullableTypeContract.UnderlyingTypeContract">
+            <summary>
+            Gets or sets the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for 
+            the underlying type of <see cref="T:System.Nullable`1"/>.
             </summary>
         </member>
         <member name="T:cmstar.Serialization.Json.Contracts.NumberContract">
@@ -1327,6 +1374,142 @@
             how to serialize the properties or fields of the underlying type.
             </summary>
         </member>
+        <member name="T:cmstar.Serialization.Json.Contracts.StringContract">
+            <summary>
+            The contract for strings.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.StringContract.#ctor(System.Type)">
+            <summary>
+            Initialize a new instance of <see cref="T:cmstar.Serialization.Json.Contracts.StringContract"/>.
+            </summary>
+            <param name="type">The underlying type. Can be <see cref="T:System.String"/> or <see cref="T:System.Char"/>.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.StringContract.DoWrite(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:cmstar.Serialization.Json.Contracts.StringContract.DoRead(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)">
+            <inheritdoc />
+        </member>
+        <member name="T:cmstar.Serialization.Json.IJsonContractResolver">
+            <summary>
+            Represents a resolves that resolves <see cref="T:cmstar.Serialization.Json.JsonContract"/>s for types.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.IJsonContractResolver.ResolveContract(System.Object)">
+            <summary>
+            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given object.
+            </summary>
+            <param name="obj">The object to resolve.</param>
+            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.IJsonContractResolver.ResolveContract(System.Type)">
+            <summary>
+            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
+            </summary>
+            <param name="type">The type to resolve.</param>
+            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.IJsonContractResolver.RegisterContract(System.Type,cmstar.Serialization.Json.JsonContract)">
+            <summary>
+            Specify the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
+            If there's already a contract for the type, it will be replaced.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="contract">The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/>.</param>
+        </member>
+        <member name="T:cmstar.Serialization.Json.JsonContract">
+            <summary>
+            A contract that specifies how to serialize/deserialize JSONs.
+            This is an abstract class.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/>
+            with the given underlying type.
+            </summary>
+            <param name="type">The underlying type.</param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonContract.UnderlyingType">
+            <summary>
+            Gets the underlying type of the current <see cref="T:cmstar.Serialization.Json.JsonContract"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.Write(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)">
+            <summary>
+            Writes the JSON represents the given object to the <see cref="T:cmstar.Serialization.Json.JsonWriter"/>.
+            </summary>
+            <param name="writer">
+            The instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> the JSON will be written to.
+            </param>
+            <param name="state">
+            A instance of <see cref="T:cmstar.Serialization.Json.JsonSerializingState"/> that may contains some 
+            options for serializing.
+            </param>
+            <param name="contractResolver">
+            A <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/> which is used to resolve
+            <see cref="T:cmstar.Serialization.Json.JsonContract"/>s during the serialization.
+            </param>
+            <param name="obj">
+            The object for generating the JSON. 
+            </param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)">
+            <summary>
+            Read the JSON represents a intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/> from
+            the <see cref="T:cmstar.Serialization.Json.JsonReader"/>.
+            </summary>
+            <param name="reader">
+            The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/> the JSON will be read from.
+            </param>
+            <param name="state">
+            A instance of <see cref="T:cmstar.Serialization.Json.JsonDeserializingState"/> that may contains some 
+            options for deserializing.
+            </param>
+            <returns>An intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/>.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.DoWrite(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)">
+            <summary>
+            Performs the writing.
+            This method will be called by the <see cref="M:cmstar.Serialization.Json.JsonContract.Write(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)"/> method.
+            </summary>
+            <param name="writer">
+            The instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> the JSON will be written to.
+            </param>
+            <param name="state">
+            A instance of <see cref="T:cmstar.Serialization.Json.JsonSerializingState"/> that may contains some 
+            options for serializing.
+            </param>
+            <param name="contractResolver">
+            A <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/> which is used to resolve
+            <see cref="T:cmstar.Serialization.Json.JsonContract"/>s during the serialization.
+            </param>
+            <param name="obj">
+            The object for generating the JSON. 
+            </param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.DoRead(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)">
+            <summary>
+            Performs the reading.
+            This method will be called by the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method.
+            </summary>
+            <param name="reader">
+            The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/> the JSON will be read from.
+            </param>
+            <param name="state">
+            A instance of <see cref="T:cmstar.Serialization.Json.JsonDeserializingState"/> that may contains some 
+            options for deserializing.
+            </param>
+            <returns>An intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/>.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContract.SkipPropertyValue(cmstar.Serialization.Json.JsonReader)">
+            <summary>
+            Skip the property value at the current position on the reader.
+            The method can only be called after a <see cref="F:cmstar.Serialization.Json.JsonToken.PropertyName"/> being read.
+            </summary>
+            <param name="reader">The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/>.</param>
+        </member>
         <member name="T:cmstar.Serialization.Json.JsonContractException">
             <summary>
             Represents the errors thrown by the implementations of <see cref="T:cmstar.Serialization.Json.JsonContract"/>.
@@ -1347,6 +1530,121 @@
             </summary>
             <param name="message">The message that describe the error.</param>
             <param name="innerException">The exception that is the cause of this exception.</param>
+        </member>
+        <member name="T:cmstar.Serialization.Json.JsonContractResolver">
+            <summary>
+            The default implementation of <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContractResolver"/>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.#ctor(System.Collections.Generic.IDictionary{System.Type,cmstar.Serialization.Json.JsonContract})">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContractResolver"/>
+            with a dictionary which contains some ready-made <see cref="T:cmstar.Serialization.Json.JsonContract"/>s.
+            </summary>
+            <param name="contracts">
+            The dictionary which contains some ready-made <see cref="T:cmstar.Serialization.Json.JsonContract"/>s.
+            </param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonContractResolver.CaseSensitive">
+            <summary>
+            Indicates if the mappings between JSON property names and CLR type members (fields/properties)
+            are case-sensitive. The default value is <c>true</c>.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.ResolveContract(System.Object)">
+            <summary>
+            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given object.
+            </summary>
+            <param name="obj">The object to resolve.</param>
+            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.ResolveContract(System.Type)">
+            <summary>
+            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
+            </summary>
+            <param name="type">The type to resolve.</param>
+            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.RegisterContract(System.Type,cmstar.Serialization.Json.JsonContract)">
+            <summary>
+            Specify the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
+            If there's already a contract for the type, it will be replaced.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="contract">The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/>.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonContractResolver.DoResolve(System.Type)">
+            <summary>
+            Performs the contract resolving.
+            Override this method to customize the resolving.
+            </summary>
+            <param name="type">The type to resolve.</param>
+            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
+        </member>
+        <member name="T:cmstar.Serialization.Json.JsonConvert">
+            <summary>
+            Provides methods for converting between CLR types and JSON types.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.ToString(System.Object)">
+            <summary>
+            Converts an object to its JSON string representation.
+            </summary>
+            <param name="obj">The object.</param>
+            <returns>The JSON string representation of the object.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.ToJsonDateTimeValue(System.DateTime,System.Boolean)">
+            <summary>
+            Convert a value of <see cref="T:System.DateTime"/> to a string representation 
+            of a datetime in a JSON. 
+            </summary>
+            <param name="dateTime">
+            The datetime value.
+            If the kind of the datetime is not <see cref="F:System.DateTimeKind.Utc"/>,
+            the result would contains a timezone offset.
+            </param>
+            <param name="wrappedInSlashes">
+            Indicates whether to wrap the datetime value in a pair of slashes.
+            If <c>true</c>, the datetime value will be in this format:'/Date(1xxxxxxxxxxxx+yyyy)/';
+            otherwise, no prefix and surfix:'Date(1xxxxxxxxxxxx+yyyy)'.
+            </param>
+            <returns>A string represents a datetime value in a JSON.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.ClrTicksToJavascriptTicks(System.Int64)">
+            <summary>
+            Convert a number of ticks in the CLR to a number of ticks in Javascript.
+            </summary>
+            <param name="clrTicks">The number of ticks in the CLR.</param>
+            <returns>The number of ticks in Javascript.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.JavascriptTicksToClrTicks(System.Int64)">
+            <summary>
+            Convert a number of ticks in Javascript to a number of ticks in the CLR.
+            </summary>
+            <param name="javascriptTicks">The number of ticks in Javascript.</param>
+            <returns>The number of ticks in the CLR.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.TryParseJsonDateTimeValue(System.String,System.DateTime@)">
+            <summary>
+            Convert the string representation of a Javascript datetime value 
+            to a <see cref="T:System.DateTime"/> with <see cref="P:System.DateTime.Kind"/> as <see cref="F:System.DateTimeKind.Local"/>.
+            A return value indicates whether the conversion succeeded or failed.
+            </summary>
+            <param name="value">The string.</param>
+            <param name="dateTime">
+            The datetime result.
+            The kind of datetime is <see cref="F:System.DateTimeKind.Local"/>.
+            This is a output parameter.
+            </param>
+            <returns><c>true</c> if the conversion succeeded; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonConvert.TryGetDateDataIndexes(System.String,System.Int32@,System.Int32@)">
+            \Date(1xxxxxxxxxxxx+yyyy)\
         </member>
         <member name="T:cmstar.Serialization.Json.JsonDeserializingState">
             <summary>
@@ -1483,349 +1781,11 @@
             Returns <see cref="F:cmstar.Serialization.Json.JsonToken.None"/> if not specified.
             </summary>
         </member>
-        <member name="T:cmstar.Serialization.Json.JsonContractResolver">
-            <summary>
-            The default implementation of <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContractResolver.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContractResolver"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContractResolver.#ctor(System.Collections.Generic.IDictionary{System.Type,cmstar.Serialization.Json.JsonContract})">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContractResolver"/>
-            with a dictionary which contains some ready-made <see cref="T:cmstar.Serialization.Json.JsonContract"/>s.
-            </summary>
-            <param name="contracts">
-            The dictionary which contains some ready-made <see cref="T:cmstar.Serialization.Json.JsonContract"/>s.
-            </param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonContractResolver.CaseSensitive">
-            <summary>
-            Indicates if the mappings between JSON property names and CLR type members (fields/properties)
-            are case-sensitive. The default value is <c>true</c>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContractResolver.ResolveContract(System.Object)">
-            <summary>
-            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given object.
-            </summary>
-            <param name="obj">The object to resolve.</param>
-            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContractResolver.ResolveContract(System.Type)">
-            <summary>
-            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
-            </summary>
-            <param name="type">The type to resolve.</param>
-            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContractResolver.DoResolve(System.Type)">
-            <summary>
-            Performs the contract resolving.
-            Override this method to customize the resolving.
-            </summary>
-            <param name="type">The type to resolve.</param>
-            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
-        </member>
-        <member name="T:cmstar.Serialization.Json.JsonConvert">
-            <summary>
-            Provides methods for converting between CLR types and JSON types.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.ToString(System.Object)">
-            <summary>
-            Converts an object to its JSON string representation.
-            </summary>
-            <param name="obj">The object.</param>
-            <returns>The JSON string representation of the object.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.ToJsonDateTimeValue(System.DateTime,System.Boolean)">
-            <summary>
-            Convert a value of <see cref="T:System.DateTime"/> to a string representation 
-            of a datetime in a JSON. 
-            </summary>
-            <param name="dateTime">
-            The datetime value.
-            If the kind of the datetime is not <see cref="F:System.DateTimeKind.Utc"/>,
-            the result would contains a timezone offset.
-            </param>
-            <param name="wrappedInSlashes">
-            Indicates whether to wrap the datetime value in a pair of slashes.
-            If <c>true</c>, the datetime value will be in this format:'/Date(1xxxxxxxxxxxx+yyyy)/';
-            otherwise, no prefix and surfix:'Date(1xxxxxxxxxxxx+yyyy)'.
-            </param>
-            <returns>A string represents a datetime value in a JSON.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.ClrTicksToJavascriptTicks(System.Int64)">
-            <summary>
-            Convert a number of ticks in the CLR to a number of ticks in Javascript.
-            </summary>
-            <param name="clrTicks">The number of ticks in the CLR.</param>
-            <returns>The number of ticks in Javascript.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.JavascriptTicksToClrTicks(System.Int64)">
-            <summary>
-            Convert a number of ticks in Javascript to a number of ticks in the CLR.
-            </summary>
-            <param name="javascriptTicks">The number of ticks in Javascript.</param>
-            <returns>The number of ticks in the CLR.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.TryParseJsonDateTimeValue(System.String,System.DateTime@)">
-            <summary>
-            Convert the string representation of a Javascript datetime value 
-            to a <see cref="T:System.DateTime"/>.
-            A return value indicates whether the conversion succeeded or failed.
-            </summary>
-            <param name="value">The string.</param>
-            <param name="dateTime">
-            The datetime result.
-            The kind of datetime is <see cref="F:System.DateTimeKind.Local"/>.
-            This is a output parameter.
-            </param>
-            <returns><c>true</c> if the convertion succeeded; otherwise <c>false</c>.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonConvert.TryGetDateDataIndexes(System.String,System.Int32@,System.Int32@)">
-            \Date(1xxxxxxxxxxxx+yyyy)\
-        </member>
         <member name="T:cmstar.Serialization.Json.JsonIgnoreAttribute">
             <summary>
             Instructs the <see cref="T:cmstar.Serialization.Json.JsonSerializer"/> not to write out 
             the value of a public field or property.
             </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.JsonSerializingState">
-            <summary>
-            Keeps the state for serializing.
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonSerializingState.CheckCycleReference">
-            <summary>
-            Gets or sets a value that indicates whether to check for 
-            the cycle reference during serailizing.
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonSerializingState.SerializingObjectStack">
-            <summary>
-            Gets a <see cref="T:System.Collections.Stack"/> storing the object references during serializing.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.Json.JsonWriter">
-            <summary>
-            Represents a writer that provides forward-only means of generating JSON data.
-            </summary>
-        </member>
-        <member name="F:cmstar.Serialization.Json.JsonWriter.Writer">
-            <summary>
-            The internal <see cref="T:System.IO.TextWriter"/> which the JSON is written to.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.#ctor(System.IO.TextWriter)">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> with the given 
-            instance of <see cref="T:System.IO.TextWriter"/>.
-            </summary>
-            <param name="writer">
-            The instance of <see cref="T:System.IO.TextWriter"/> which the JSON is written to.
-            </param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonWriter.AutoCloseInternalWriter">
-            <summary>
-            Gets or sets a value that indicates whether to close the internal 
-            <see cref="T:System.IO.TextWriter"/> when the <see cref="M:cmstar.Serialization.Json.JsonWriter.Dispose"/> method is called.
-            The default value is <c>true</c>.
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonWriter.EscapeSolidus">
-            <summary>
-            Indicates whether to escape the soliduses('/') in strings (to '\/').
-            The default value is <c>true</c>.
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonWriter.QuoteChar">
-            <summary>
-            Gets or sets the character used for a quote.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteObjectStart">
-            <summary>
-            Write a '{' which indicates a beginning of a JSON object.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteObjectEnd">
-            <summary>
-            Write a '}' which indicates an end of a JSON object.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteArrayStart">
-            <summary>
-            Write a '[' which indicates a beginning of a JSON array.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteArrayEnd">
-            <summary>
-            Write a ']' which indicates a end of a JSON array.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WritePropertyName(System.String)">
-            <summary>
-            Write a JSON property name like '"name":'.
-            A <c>null</c> name is treated as an empty string.
-            </summary>
-            <param name="name">The property name.</param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteComma">
-            <summary>
-            Write a comma for properties or array elements.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteUndefinedValue">
-            <summary>
-            Write a JSON 'undefined'.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteNullValue">
-            <summary>
-            Write a JSON 'null'.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteRawStringValue(System.String)">
-            <summary>
-            Write a string value which will not be escaped.
-            </summary>
-            <param name="value">The string value.</param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteStringValue(System.String)">
-            <summary>
-            Write a string value, the value will be escaped.
-            </summary>
-            <param name="value">The string value.</param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteBooleanValue(System.Boolean)">
-            <summary>
-            Write a boolean value (true/false).
-            </summary>
-            <param name="value">The boolean value.</param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteNumberValue(System.String)">
-            <summary>
-            Write a string value that represents a number.
-            NULL will lead to a JSON 'null'.
-            </summary>
-            <param name="value">The value to be written.</param>
-        </member>
-        <member name="T:cmstar.Serialization.Json.IJsonContractResolver">
-            <summary>
-            Represents a resolves that resolves <see cref="T:cmstar.Serialization.Json.JsonContract"/>s for types.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.IJsonContractResolver.ResolveContract(System.Object)">
-            <summary>
-            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given object.
-            </summary>
-            <param name="obj">The object to resolve.</param>
-            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.IJsonContractResolver.ResolveContract(System.Type)">
-            <summary>
-            Resolves the <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the given type.
-            </summary>
-            <param name="type">The type to resolve.</param>
-            <returns>The instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/> for the type.</returns>
-        </member>
-        <member name="T:cmstar.Serialization.Json.JsonContract">
-            <summary>
-            A contract that specifies how to serialize/deserialize JSONs.
-            This is an abstract class.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonContract"/>
-            with the given underlying type.
-            </summary>
-            <param name="type">The underlying type.</param>
-        </member>
-        <member name="P:cmstar.Serialization.Json.JsonContract.UnderlyingType">
-            <summary>
-            Gets the underlying type of the current <see cref="T:cmstar.Serialization.Json.JsonContract"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.Write(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)">
-            <summary>
-            Writes the JSON represents the given object to the <see cref="T:cmstar.Serialization.Json.JsonWriter"/>.
-            </summary>
-            <param name="writer">
-            The instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> the JSON will be written to.
-            </param>
-            <param name="state">
-            A instance of <see cref="T:cmstar.Serialization.Json.JsonSerializingState"/> that may contains some 
-            options for serializing.
-            </param>
-            <param name="contractResolver">
-            A <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/> which is used to resolve
-            <see cref="T:cmstar.Serialization.Json.JsonContract"/>s during the serialization.
-            </param>
-            <param name="obj">
-            The object for generating the JSON. 
-            </param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)">
-            <summary>
-            Read the JSON represents a intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/> from
-            the <see cref="T:cmstar.Serialization.Json.JsonReader"/>.
-            </summary>
-            <param name="reader">
-            The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/> the JSON will be read from.
-            </param>
-            <param name="state">
-            A instance of <see cref="T:cmstar.Serialization.Json.JsonDeserializingState"/> that may contains some 
-            options for deserializing.
-            </param>
-            <returns>An intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/>.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.DoWrite(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)">
-            <summary>
-            Performs the writing.
-            This method will be called by the <see cref="M:cmstar.Serialization.Json.JsonContract.Write(cmstar.Serialization.Json.JsonWriter,cmstar.Serialization.Json.JsonSerializingState,cmstar.Serialization.Json.IJsonContractResolver,System.Object)"/> method.
-            </summary>
-            <param name="writer">
-            The instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> the JSON will be written to.
-            </param>
-            <param name="state">
-            A instance of <see cref="T:cmstar.Serialization.Json.JsonSerializingState"/> that may contains some 
-            options for serializing.
-            </param>
-            <param name="contractResolver">
-            A <see cref="T:cmstar.Serialization.Json.IJsonContractResolver"/> which is used to resolve
-            <see cref="T:cmstar.Serialization.Json.JsonContract"/>s during the serialization.
-            </param>
-            <param name="obj">
-            The object for generating the JSON. 
-            </param>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.DoRead(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)">
-            <summary>
-            Performs the reading.
-            This method will be called by the <see cref="M:cmstar.Serialization.Json.JsonContract.Read(cmstar.Serialization.Json.JsonReader,cmstar.Serialization.Json.JsonDeserializingState)"/> method.
-            </summary>
-            <param name="reader">
-            The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/> the JSON will be read from.
-            </param>
-            <param name="state">
-            A instance of <see cref="T:cmstar.Serialization.Json.JsonDeserializingState"/> that may contains some 
-            options for deserializing.
-            </param>
-            <returns>An intance of the <see cref="P:cmstar.Serialization.Json.JsonContract.UnderlyingType"/>.</returns>
-        </member>
-        <member name="M:cmstar.Serialization.Json.JsonContract.SkipPropertyValue(cmstar.Serialization.Json.JsonReader)">
-            <summary>
-            Skip the property value at the current position on the reader.
-            The method can only be called after a <see cref="F:cmstar.Serialization.Json.JsonToken.PropertyName"/> being read.
-            </summary>
-            <param name="reader">The instance of <see cref="T:cmstar.Serialization.Json.JsonReader"/>.</param>
         </member>
         <member name="T:cmstar.Serialization.Json.JsonPropertyAttribute">
             <summary>
@@ -2095,6 +2055,22 @@
             </param>
             <returns>The object deserialized from the JSON.</returns>
         </member>
+        <member name="T:cmstar.Serialization.Json.JsonSerializingState">
+            <summary>
+            Keeps the state for serializing.
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonSerializingState.CheckCycleReference">
+            <summary>
+            Gets or sets a value that indicates whether to check for 
+            the cycle reference during serailizing.
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonSerializingState.SerializingObjectStack">
+            <summary>
+            Gets a <see cref="T:System.Collections.Stack"/> storing the object references during serializing.
+            </summary>
+        </member>
         <member name="T:cmstar.Serialization.Json.JsonToken">
             <summary>
             Defines tokens in JSONs.
@@ -2161,6 +2137,110 @@
             The comma used for separating the array elements or properties.
             </summary>
         </member>
+        <member name="T:cmstar.Serialization.Json.JsonWriter">
+            <summary>
+            Represents a writer that provides forward-only means of generating JSON data.
+            </summary>
+        </member>
+        <member name="F:cmstar.Serialization.Json.JsonWriter.Writer">
+            <summary>
+            The internal <see cref="T:System.IO.TextWriter"/> which the JSON is written to.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of <see cref="T:cmstar.Serialization.Json.JsonWriter"/> with the given 
+            instance of <see cref="T:System.IO.TextWriter"/>.
+            </summary>
+            <param name="writer">
+            The instance of <see cref="T:System.IO.TextWriter"/> which the JSON is written to.
+            </param>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonWriter.AutoCloseInternalWriter">
+            <summary>
+            Gets or sets a value that indicates whether to close the internal 
+            <see cref="T:System.IO.TextWriter"/> when the <see cref="M:cmstar.Serialization.Json.JsonWriter.Dispose"/> method is called.
+            The default value is <c>true</c>.
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonWriter.EscapeSolidus">
+            <summary>
+            Indicates whether to escape the soliduses('/') in strings (to '\/').
+            The default value is <c>true</c>.
+            </summary>
+        </member>
+        <member name="P:cmstar.Serialization.Json.JsonWriter.QuoteChar">
+            <summary>
+            Gets or sets the character used for a quote.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteObjectStart">
+            <summary>
+            Write a '{' which indicates a beginning of a JSON object.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteObjectEnd">
+            <summary>
+            Write a '}' which indicates an end of a JSON object.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteArrayStart">
+            <summary>
+            Write a '[' which indicates a beginning of a JSON array.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteArrayEnd">
+            <summary>
+            Write a ']' which indicates a end of a JSON array.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WritePropertyName(System.String)">
+            <summary>
+            Write a JSON property name like '"name":'.
+            A <c>null</c> name is treated as an empty string.
+            </summary>
+            <param name="name">The property name.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteComma">
+            <summary>
+            Write a comma for properties or array elements.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteUndefinedValue">
+            <summary>
+            Write a JSON 'undefined'.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteNullValue">
+            <summary>
+            Write a JSON 'null'.
+            </summary>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteRawStringValue(System.String)">
+            <summary>
+            Write a string value which will not be escaped.
+            </summary>
+            <param name="value">The string value.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteStringValue(System.String)">
+            <summary>
+            Write a string value, the value will be escaped.
+            </summary>
+            <param name="value">The string value.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteBooleanValue(System.Boolean)">
+            <summary>
+            Write a boolean value (true/false).
+            </summary>
+            <param name="value">The boolean value.</param>
+        </member>
+        <member name="M:cmstar.Serialization.Json.JsonWriter.WriteNumberValue(System.String)">
+            <summary>
+            Write a string value that represents a number.
+            NULL will lead to a JSON 'null'.
+            </summary>
+            <param name="value">The value to be written.</param>
+        </member>
         <member name="T:cmstar.Serialization.Json.JsonWriterImproved">
             <summary>
             Represents a writer that provides non-cached and forward-only means of 
@@ -2168,58 +2248,6 @@
             This writer is an improved implementation of <see cref="T:cmstar.Serialization.Json.JsonWriter"/>,
             it can validate the JSON data being written, throws <see cref="T:cmstar.Serialization.Json.JsonFormatException"/> 
             on invalid data, and provides the ability of formatting the JSON text automatically.
-            </summary>
-        </member>
-        <member name="T:cmstar.Serialization.IndentedTextWriter">
-            <summary>
-            Provides a text writer that can indent new lines.
-            </summary>
-        </member>
-        <member name="F:cmstar.Serialization.IndentedTextWriter.MaxIndentLevel">
-            <summary>
-            The max indent level allowed in the <see cref="T:cmstar.Serialization.IndentedTextWriter"/>.
-            </summary>
-        </member>
-        <member name="F:cmstar.Serialization.IndentedTextWriter.DefaultIndentMark">
-            <summary>
-            The default string for indentations.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.IndentedTextWriter.#ctor(System.IO.TextWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:cmstar.Serialization.IndentedTextWriter"/> 
-            using the specified text writer and default indent mark.
-            </summary>
-            <param name="textWriter">The <see cref="T:System.IO.TextWriter"/> for output.</param>
-        </member>
-        <member name="M:cmstar.Serialization.IndentedTextWriter.#ctor(System.IO.TextWriter,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:cmstar.Serialization.IndentedTextWriter"/> 
-            using the specified text writer and indent mark.
-            </summary>
-            <param name="textWriter">The <see cref="T:System.IO.TextWriter"/> for output.</param>
-            <param name="indentMark">The indent mark used for indentations.</param>
-        </member>
-        <member name="P:cmstar.Serialization.IndentedTextWriter.IndentMark">
-            <summary>
-            Gets the string used for indentations in the <see cref="T:cmstar.Serialization.IndentedTextWriter"/>。
-            </summary>
-        </member>
-        <member name="P:cmstar.Serialization.IndentedTextWriter.IndentLevel">
-            <summary>
-            Gets the indent level.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.IndentedTextWriter.IndentIncrease">
-            <summary>
-            Increases the indent level by 1.
-            The indent level will not change if already reached the <see cref="F:cmstar.Serialization.IndentedTextWriter.MaxIndentLevel"/>.
-            </summary>
-        </member>
-        <member name="M:cmstar.Serialization.IndentedTextWriter.IndentDecrease">
-            <summary>
-            Decreases the indent level by 1.
-            The indent level will not change if it is zero.
             </summary>
         </member>
     </members>

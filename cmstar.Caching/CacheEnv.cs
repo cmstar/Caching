@@ -9,7 +9,7 @@
         /// 用于在本地内存缓存中表示<c>null</c>。
         /// </summary>
         /// <remarks>
-        /// 例如<see cref="System.Web.HttpRuntime.Cache"/>不支持缓存null，为了能使null被缓存下来，
+        /// 例如 MemoryCache 不支持缓存null，为了能使null被缓存下来，
         /// 需用一个特殊的对象类表示null。
         /// </remarks>
         internal static readonly object NullValue = new object();

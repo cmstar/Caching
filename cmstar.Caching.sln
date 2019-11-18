@@ -1,15 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching", "cmstar.Caching\cmstar.Caching.csproj", "{66A17AD3-9983-4B29-8DB3-44218DB9ED58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching", "cmstar.Caching\cmstar.Caching.csproj", "{66A17AD3-9983-4B29-8DB3-44218DB9ED58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Redis", "cmstar.Caching.Redis\cmstar.Caching.Redis.csproj", "{8447E517-A328-464D-98B7-2F6490858604}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching.Redis", "cmstar.Caching.Redis\cmstar.Caching.Redis.csproj", "{8447E517-A328-464D-98B7-2F6490858604}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Tests", "cmstar.Caching.Tests\cmstar.Caching.Tests.csproj", "{818F7308-E215-4CB6-8BFF-C91C92F8288B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Redis.Tests", "cmstar.Caching.Redis.Tests\cmstar.Caching.Redis.Tests.csproj", "{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{990F41F4-698C-4691-9399-54140C3D2C88}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{46607787-2DB9-4012-A788-F02D8BABE011}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +40,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66A17AD3-9983-4B29-8DB3-44218DB9ED58} = {990F41F4-698C-4691-9399-54140C3D2C88}
+		{8447E517-A328-464D-98B7-2F6490858604} = {990F41F4-698C-4691-9399-54140C3D2C88}
+		{818F7308-E215-4CB6-8BFF-C91C92F8288B} = {46607787-2DB9-4012-A788-F02D8BABE011}
+		{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F} = {46607787-2DB9-4012-A788-F02D8BABE011}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB5A7B3A-B003-4F59-BACF-28AB7B28798F}

@@ -1,81 +1,59 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{818F7308-E215-4CB6-8BFF-C91C92F8288B}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <!--Build options-->
+    <TargetFrameworks>net46;netcoreapp2.1;</TargetFrameworks>
     <RootNamespace>cmstar.Caching</RootNamespace>
     <AssemblyName>cmstar.Caching.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591;1701;1702;3021</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <!--Compiling contants-->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DefineConstants>TRACE;</DefineConstants>
+    <DocumentationFile />
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>NETCORE;NETCORE2_1</DefineConstants>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CacheFieldAccessableTestBase.cs" />
-    <Compile Include="CacheFieldIncreasableTestBase.cs" />
-    <Compile Include="CacheIncreasableTestBase.cs" />
-    <Compile Include="CacheOperationTests.cs" />
-    <Compile Include="CacheProviderTestBase.cs" />
-    <Compile Include="CacheValueClass.cs" />
-    <Compile Include="CacheValueStruct.cs" />
-    <Compile Include="CountedCacheProvider.cs" />
-    <Compile Include="HttpRuntimeCacheProviderSlimTests.cs" />
-    <Compile Include="HttpRuntimeCacheProviderTests.cs" />
-    <Compile Include="L2CacheProviderTests.cs" />
-    <Compile Include="LoadBalancing\BalancerApiCounter.cs" />
-    <Compile Include="LoadBalancing\CacheBalancerTests.cs" />
-    <Compile Include="LoadBalancing\CacheFieldAccessableBalancerTests.cs" />
-    <Compile Include="LoadBalancing\CacheFieldIncreasableBalancerTests.cs" />
-    <Compile Include="LoadBalancing\CacheIncreasableBalancerTests.cs" />
-    <Compile Include="MemoryCacheProviderSlimTests.cs" />
-    <Compile Include="MemoryCacheProviderTests.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleObjectCacheProvider.cs" />
-    <Compile Include="SimpleObjectCacheProviderTests.cs" />
-    <Compile Include="SynchronizationAdapters.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="StackExchange.Redis">
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <Reference Include="cmstar.Serialization">
       <HintPath>..\lib\cmstar.Serialization.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\cmstar.Caching\cmstar.Caching.csproj">
-      <Project>{66a17ad3-9983-4b29-8db3-44218db9ed58}</Project>
-      <Name>cmstar.Caching</Name>
-    </ProjectReference>
+
+    <ProjectReference Include="..\cmstar.Caching\cmstar.Caching.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <!--net46-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
+    <Reference Include="cmstar.Serialization">
+      <HintPath>..\lib\net45\cmstar.Serialization.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!--netstandard2.0-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+    <Reference Include="cmstar.Serialization">
+      <HintPath>..\lib\netstandard2.0\cmstar.Serialization.dll</HintPath>
+    </Reference>
+
+    <Compile Remove="HttpRuntimeCacheProviderTests.cs" />
+    <Compile Remove="HttpRuntimeCacheProviderSlimTests.cs" />
+    <Compile Remove="MemoryCacheProvider.cs" />
+    <Compile Remove="MemoryCacheProviderSlim.cs" />
+  </ItemGroup>
+
 </Project>

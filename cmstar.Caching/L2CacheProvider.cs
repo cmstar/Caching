@@ -8,7 +8,7 @@ namespace cmstar.Caching
     /// </summary>
     /// <remarks>
     /// 注意：两个不同层次的缓存将使用相同的缓存键。
-    /// 两级缓存需由不同的缓存提供器提供，使用诸如<see cref="HttpRuntimeCacheProvider"/>
+    /// 两级缓存需由不同的缓存提供器提供，使用诸如 HttpRuntimeCacheProvider
     /// 等底层实现为单例的缓存提供器，将导致一级和二级缓存间互相覆盖从而导致预期外的结果。
     /// </remarks>
     public partial class L2CacheProvider : ICacheProvider
