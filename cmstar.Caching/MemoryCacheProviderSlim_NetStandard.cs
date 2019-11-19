@@ -47,7 +47,7 @@ namespace cmstar.Caching
         /// <inheritdoc />
         public T Get<T>(string key)
         {
-            return _cache.TryGetValue(key, out T value)
+            return TryGet(key, out T value)
                 ? value
                 : default(T);
         }
@@ -55,7 +55,26 @@ namespace cmstar.Caching
         /// <inheritdoc />
         public bool TryGet<T>(string key, out T value)
         {
-            return _cache.TryGetValue(key, out value);
+            // 为支持类型转换和 NULL 的存储，必须先取 object 值，之后进行判断处理。
+            // 若直接 out T cacheValue，则缓存值类型不是 T 的情况下，会获得默认值，不符合预期。
+            if (!_cache.TryGetValue(key, out var cacheValue))
+            {
+                value = default(T);
+                return false;
+            }
+
+            if (ReferenceEquals(CacheEnv.NullValue, cacheValue))
+            {
+                value = default(T);
+                return true;
+            }
+
+            var rawValue = ((CacheValue)cacheValue).Value;
+            value = rawValue is T t
+                ? t
+                : (T)Convert.ChangeType(rawValue, typeof(T));
+
+            return true;
         }
 
         /// <inheritdoc />
@@ -72,7 +91,7 @@ namespace cmstar.Caching
         /// <inheritdoc />
         public bool Create<T>(string key, T value, TimeSpan expiration)
         {
-            var hasValue = _cache.TryGetValue(key, out var _);
+            var hasValue = _cache.TryGetValue(key, out _);
             if (hasValue)
                 return false;
 
@@ -83,7 +102,7 @@ namespace cmstar.Caching
         /// <inheritdoc />
         public bool Remove(string key)
         {
-            var hasValue = _cache.TryGetValue(key, out var _);
+            var hasValue = _cache.TryGetValue(key, out _);
             _cache.Remove(key);
             return hasValue;
         }
