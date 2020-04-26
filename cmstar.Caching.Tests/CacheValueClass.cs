@@ -66,6 +66,38 @@ namespace cmstar.Caching
             return true;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is CacheValueClass other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                // ReSharper disable NonReadonlyMemberInGetHashCode
+                var hashCode = (StringField != null ? StringField.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ LongField.GetHashCode();
+                hashCode = (hashCode * 397) ^ IntField;
+                hashCode = (hashCode * 397) ^ ShortField.GetHashCode();
+                hashCode = (hashCode * 397) ^ ByteField.GetHashCode();
+                hashCode = (hashCode * 397) ^ NullableField.GetHashCode();
+                hashCode = (hashCode * 397) ^ DateTimeField.GetHashCode();
+                hashCode = (hashCode * 397) ^ StructField.GetHashCode();
+
+                if (ArrayField != null)
+                {
+                    for (int i = 0; i < ArrayField.Count; i++)
+                    {
+                        hashCode = (hashCode * 397) ^ ArrayField[i].GetHashCode();
+                    }
+                }
+                // ReSharper restore NonReadonlyMemberInGetHashCode
+
+                return hashCode;
+            }
+        }
+
         public object Clone()
         {
             var json = JsonSerializer.Default.Serialize(this);

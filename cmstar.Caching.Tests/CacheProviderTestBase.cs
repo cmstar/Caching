@@ -254,6 +254,12 @@ namespace cmstar.Caching
         public void TestOnNullable()
         {
             PerformTestCacheProvider((CacheValueStruct?)null);
+            PerformTestCacheProvider((int?)null);
+            PerformTestCacheProvider((DateTime?)null);
+
+            PerformTestCacheProvider((CacheValueStruct?)new CacheValueStruct());
+            PerformTestCacheProvider((int?)13);
+            PerformTestCacheProvider((DateTime?)DateTime.Now);
         }
 
         [Test]
