@@ -125,7 +125,9 @@ namespace cmstar.Caching
                     return increment;
                 }
 
-                var result = Adding.AddIntegers(cacheValue.Value, increment);
+                var result = Adding.AddIntegers(cacheValue?.Value, increment);
+
+                // ReSharper disable once PossibleNullReferenceException
                 cacheValue.Value = result.Value;
 
                 return result.IsIncrementType
