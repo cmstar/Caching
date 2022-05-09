@@ -110,8 +110,6 @@ namespace cmstar.Caching
         /// </remarks>
         private static void PreserveStackTrace(Exception ex)
         {
-            ArgAssert.NotNull(ex, nameof(ex));
-
             var m = ex.GetType().GetMethod(
                 "InternalPreserveStackTrace",
                 BindingFlags.Instance | BindingFlags.NonPublic);

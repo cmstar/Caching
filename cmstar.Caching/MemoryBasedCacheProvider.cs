@@ -1,7 +1,7 @@
 ﻿using System;
-using cmstar.Caching.Reflection;
-using cmstar.Caching.Reflection.Emit;
 using System.Collections.Concurrent;
+using cmstar.Caching.Reflection;
+using cmstar.RapidReflection.Emit;
 
 namespace cmstar.Caching
 {

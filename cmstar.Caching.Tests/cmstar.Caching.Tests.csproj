@@ -27,18 +27,9 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <Reference Include="cmstar.Serialization">
-      <HintPath>..\lib\cmstar.Serialization.dll</HintPath>
-    </Reference>
+    <PackageReference Include="cmstar.Serialization.Json" Version="1.0.0" />
 
     <ProjectReference Include="..\cmstar.Caching\cmstar.Caching.csproj" />
-  </ItemGroup>
-
-  <!--net46-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
-    <Reference Include="cmstar.Serialization">
-      <HintPath>..\lib\net45\cmstar.Serialization.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <!--netstandard2.0-->
@@ -46,9 +37,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-    <Reference Include="cmstar.Serialization">
-      <HintPath>..\lib\netstandard2.0\cmstar.Serialization.dll</HintPath>
-    </Reference>
 
     <Compile Remove="HttpRuntimeCacheProviderTests.cs" />
     <Compile Remove="HttpRuntimeCacheProviderSlimTests.cs" />

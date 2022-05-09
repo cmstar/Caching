@@ -29,22 +29,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="cmstar.Serialization.Json" Version="1.0.0" />
     <ProjectReference Include="..\cmstar.Caching\cmstar.Caching.csproj" />
   </ItemGroup>
 
   <!--net46-->
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
-    <Reference Include="cmstar.Serialization">
-      <HintPath>..\lib\net45\cmstar.Serialization.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <!--netstandard2.0-->
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="StackExchange.Redis" Version="2.0.600" />
-    <Reference Include="cmstar.Serialization">
-      <HintPath>..\lib\netstandard2.0\cmstar.Serialization.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
