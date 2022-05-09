@@ -7,13 +7,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching", "cmstar.Ca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching.Redis", "cmstar.Caching.Redis\cmstar.Caching.Redis.csproj", "{8447E517-A328-464D-98B7-2F6490858604}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Tests", "cmstar.Caching.Tests\cmstar.Caching.Tests.csproj", "{818F7308-E215-4CB6-8BFF-C91C92F8288B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching.Tests", "cmstar.Caching.Tests\cmstar.Caching.Tests.csproj", "{818F7308-E215-4CB6-8BFF-C91C92F8288B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmstar.Caching.Redis.Tests", "cmstar.Caching.Redis.Tests\cmstar.Caching.Redis.Tests.csproj", "{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmstar.Caching.Redis.Tests", "cmstar.Caching.Redis.Tests\cmstar.Caching.Redis.Tests.csproj", "{2B20E4EE-1D75-4B52-8DD1-675F57CDC53F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{990F41F4-698C-4691-9399-54140C3D2C88}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{46607787-2DB9-4012-A788-F02D8BABE011}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C4E8FEC2-E7F4-44A4-AE04-724A5F2B98B5}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
