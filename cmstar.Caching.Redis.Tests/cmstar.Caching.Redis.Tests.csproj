@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!--Build options-->
-    <TargetFrameworks>net46;netcoreapp2.1;</TargetFrameworks>
+    <TargetFrameworks>net46;net461;netcoreapp2.1;</TargetFrameworks>
     <RootNamespace>cmstar.Caching.Redis</RootNamespace>
     <AssemblyName>cmstar.Caching.Redis.Tests</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -44,9 +44,19 @@
     </Content>
   </ItemGroup>
 
+  <!--net461-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="System.Configuration" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+
+    <Content Include="App.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <!--netstandard2.0-->
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <PackageReference Include="StackExchange.Redis" Version="2.0.600" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />

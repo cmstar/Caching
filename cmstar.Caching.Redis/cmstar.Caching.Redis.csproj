@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!--Build options-->
-    <TargetFrameworks>net46;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>net46;net461;netstandard2.0;</TargetFrameworks>
     <RootNamespace>cmstar.Caching.Redis</RootNamespace>
     <AssemblyName>cmstar.Caching.Redis</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -38,8 +38,8 @@
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
   </ItemGroup>
 
-  <!--netstandard2.0-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="StackExchange.Redis" Version="2.0.600" />
+  <!--net461 & netstandard2.0-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
   </ItemGroup>
 </Project>
