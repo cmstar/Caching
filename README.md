@@ -1,5 +1,7 @@
 ﻿# cmstar.Caching
 
+[![NuGet](https://img.shields.io/nuget/v/cmstar.Caching.svg)](https://www.nuget.org/packages/cmstar.Caching/)
+
 一个简单的缓存框架：
 - 缓存的抽象定义 `ICacheProvider` 和快捷操作 `CacheOperation` 。
 - 完全泛型接口。
@@ -25,6 +27,20 @@
 
 
 ## 快速使用
+
+### 安装
+
+通过 Package Manager:
+```
+Install-Package cmstar.Caching
+```
+
+或通过 dotnet-cli:
+```
+dotnet add package cmstar.Caching
+```
+
+redis 提供器则安装 `cmstar.Caching.Redis` 包。
 
 ### 缓存接口及基本用法
 
