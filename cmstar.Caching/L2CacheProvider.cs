@@ -4,12 +4,10 @@ using System.Diagnostics;
 namespace cmstar.Caching
 {
     /// <summary>
-    /// 实现简单的两级缓存。
+    /// 实现简单的两级缓存。数据优先从 L1 读取，读取不到时再尝试从 L2 读取。
     /// </summary>
     /// <remarks>
-    /// 注意：两个不同层次的缓存将使用相同的缓存键。
-    /// 两级缓存需由不同的缓存提供器提供，使用诸如 HttpRuntimeCacheProvider
-    /// 等底层实现为单例的缓存提供器，将导致一级和二级缓存间互相覆盖从而导致预期外的结果。
+    /// 两个不同层次的缓存将使用相同的缓存键。两级缓存需由不同的缓存提供器提供。
     /// </remarks>
     public partial class L2CacheProvider : ICacheProvider
     {
@@ -30,6 +28,9 @@ namespace cmstar.Caching
             ArgAssert.NotNull(level2, nameof(level2));
             ArgAssert.NotNull(level1, nameof(level1));
             ArgAssert.NotNull(level1Expiration, nameof(level1Expiration));
+
+            if (level1 == level2)
+                throw new ArgumentException("The two providers must not be equal.", nameof(level1));
 
             _level1Expiration = level1Expiration;
             _level1 = level1;
